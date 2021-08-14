@@ -15,12 +15,11 @@ and straightforward. Developers can work with optionals without really knowing
 they&#39;re there. This is great to onboard beginners, but I feel that to fully
 appreciate, and leverage, optionals we need to dig a bit deeper.</p>
 <p>Let&#39;s have a look at this piece of code for example:</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">let</span> x: <span class="hljs-type">String?</span> = <span class="hljs-string">&quot;Hello World&quot;</span>
+<pre><code class="hljs swift"><span class="hljs-keyword">let</span> x: <span class="hljs-type">String</span>? <span class="hljs-operator">=</span> <span class="hljs-string">&quot;Hello World&quot;</span>
 
-<span class="hljs-keyword">if</span> <span class="hljs-keyword">let</span> y = x {
+<span class="hljs-keyword">if</span> <span class="hljs-keyword">let</span> y <span class="hljs-operator">=</span> x {
   <span class="hljs-built_in">print</span>(y)
-}
-</code></pre>
+}</code></pre>
 <p>When I started looking into Swift my understanding of this code would have been
 something like: &quot;there&#39;s a value <code>x</code> that is a <code>String</code> that may or may not be
 nil. Make sure that <code>x</code> is not nil, and if so print it&quot;.</p>
@@ -29,21 +28,19 @@ nil. Make sure that <code>x</code> is not nil, and if so print it&quot;.</p>
 be nil&quot;, but a different type all together.</p>
 <p>In fact if you add a <code>print(x.dynamicType)</code> statement in the code above you&#39;ll
 see this in the console:</p>
-<pre><code class=""><span class="hljs-keyword">Optional</span>&lt;<span class="hljs-keyword">String</span>&gt;
-</code></pre><p><code>String?</code> is actually syntactic sugar for <code>Optional&lt;String&gt;</code>, and <code>Optional</code> is
+<pre><code><span class="hljs-built_in">Optional</span><span class="hljs-operator">&lt;</span><span class="hljs-built_in">String</span><span class="hljs-operator">&gt;</span></code></pre><p><code>String?</code> is actually syntactic sugar for <code>Optional&lt;String&gt;</code>, and <code>Optional</code> is
 a type in its own right.</p>
 <p>Here&#39;s a simplified version of the header of <code>Optional</code>, which
 you can see by command-clicking on the word <code>Optional</code> in your
 code from Xcode:</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">enum</span> <span class="hljs-title">Optional</span>&lt;<span class="hljs-title">Wrapped</span>&gt; </span>{
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">enum</span> <span class="hljs-title">Optional</span>&lt;<span class="hljs-title">Wrapped</span>&gt; </span>{
 
   <span class="hljs-comment">/// The absence of a value.</span>
-  <span class="hljs-keyword">case</span> <span class="hljs-keyword">none</span>
+  <span class="hljs-keyword">case</span> none
 
   <span class="hljs-comment">/// The presence of a value, stored as `Wrapped`.</span>
-  <span class="hljs-keyword">case</span> some(<span class="hljs-type">Wrapped</span>)
-}
-</code></pre>
+  <span class="hljs-keyword">case</span> <span class="hljs-keyword">some</span>(<span class="hljs-type">Wrapped</span>)
+}</code></pre>
 <p><code>Optional</code> is actually an <code>enum</code>, defined in relation to a generic type
 <code>Wrapped</code>. It has two cases: <code>.none</code> to represent the absence of a value, and
 <code>.some</code> to represent the presence of a value, which is stored as its associated

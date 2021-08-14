@@ -8,13 +8,12 @@
 <h2 id="dummy">Dummy</h2>
 <p>A dummy is a test double that <strong>doesn&#39;t do anything</strong>.</p>
 <p>You might use this as a placeholder for an input parameter of the system under test when it doesn&#39;t interact or affect the behaviour you are testing.</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">DummyPizzaGetter</span>: <span class="hljs-title">PizzaGetter</span> </span>{
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">DummyPizzaGetter</span>: <span class="hljs-title">PizzaGetter</span> </span>{
 
-    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">getPizza</span><span class="hljs-params">(<span class="hljs-number">_</span> completion: <span class="hljs-params">(Result&lt;[Pizza], PizzaAPIError&gt;)</span></span></span> -&gt; <span class="hljs-type">Void</span>) {
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">getPizza</span>(<span class="hljs-keyword">_</span> <span class="hljs-params">completion</span>: (<span class="hljs-type">Result</span>&lt;[<span class="hljs-type">Pizza</span>], <span class="hljs-type">PizzaAPIError</span>&gt;) -&gt; <span class="hljs-type">Void</span>)</span> {
       <span class="hljs-comment">// does nothing</span>
     }
-}
-</code></pre>
+}</code></pre>
 <h2 id="fake">Fake</h2>
 <p>A fake is test double <strong>returning the same value or performing the same behaviour all the time</strong>.</p>
 <p>You might want to use this when the behaviour of the system under test has something your component does as a pre-requisite, regardless of its outcome.</p>
@@ -25,8 +24,8 @@
 <p>A common use case for stubs is to allow testing how objects behave depending on the success or failure of an operation.</p>
 <p>My favourite use case for stubs is when testing the behaviour of objects consuming a service making a request that can succeed or fail. We can write a stub in which we control whether the request succeeds or fail, and this allows us to test the behaviour of our component in both scenarios.</p>
 <p>Say we have a <code>PizzaPresenter</code> charged with providing view controllers the logic to fetch pizzas from the server and transform them into objects that can be displayed. We can test how it behaves if the request succeeds or fails using a stub.</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testSuccessfulLoad</span><span class="hljs-params">()</span></span> {
-    <span class="hljs-keyword">let</span> presenter = <span class="hljs-type">PizzaPresenter</span>(
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testSuccessfulLoad</span>()</span> {
+    <span class="hljs-keyword">let</span> presenter <span class="hljs-operator">=</span> <span class="hljs-type">PizzaPresenter</span>(
         pizzaGetter: <span class="hljs-type">PizzaGetterStub</span>(pizzas: [.margherita, .pepperoni])
     )
 
@@ -36,14 +35,14 @@
             <span class="hljs-keyword">case</span> .success(<span class="hljs-keyword">let</span> displayablePizzas):
                 <span class="hljs-comment">// expectations on the received displayable pizzas</span>
             <span class="hljs-keyword">case</span> .failure(<span class="hljs-keyword">let</span> error):
-                fail(<span class="hljs-string">&quot;Expected to succeed, failed with \(error)&quot;</span>)
+                fail(<span class="hljs-string">&quot;Expected to succeed, failed with <span class="hljs-subst">\(error)</span>&quot;</span>)
             }
         }
     }
 }
 
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testFailedLoad</span><span class="hljs-params">()</span></span> {
-    <span class="hljs-keyword">let</span> presenter = <span class="hljs-type">PizzaPresenter</span>(
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testFailedLoad</span>()</span> {
+    <span class="hljs-keyword">let</span> presenter <span class="hljs-operator">=</span> <span class="hljs-type">PizzaPresenter</span>(
         pizzaGetter: <span class="hljs-type">PizzaGetterStub</span>(error: .offline)
     )
 
@@ -51,77 +50,72 @@
         presenter.load { result <span class="hljs-keyword">in</span>
             <span class="hljs-keyword">switch</span> result {
             <span class="hljs-keyword">case</span> .success(<span class="hljs-keyword">let</span> displayablePizzas):
-                fail(<span class="hljs-string">&quot;Expected to fail, succeeded with \(dispayablePizzas)&quot;</span>)
+                fail(<span class="hljs-string">&quot;Expected to fail, succeeded with <span class="hljs-subst">\(dispayablePizzas)</span>&quot;</span>)
             <span class="hljs-keyword">case</span> .failure(<span class="hljs-keyword">let</span> error):
                 <span class="hljs-comment">// expectation on the received error</span>
             }
         }
     }
-}
-</code></pre>
+}</code></pre>
 <p>This is how the stub looks like:</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">PizzaGetterStub</span>: <span class="hljs-title">PizzaGetter</span> </span>{
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">PizzaGetterStub</span>: <span class="hljs-title">PizzaGetter</span> </span>{
 
     <span class="hljs-keyword">private</span> <span class="hljs-keyword">let</span> result: <span class="hljs-type">Result</span>&lt;[<span class="hljs-type">Pizza</span>], <span class="hljs-type">PizzaAPIError</span>&gt;
 
-    <span class="hljs-keyword">init</span>(pizzas: [<span class="hljs-type">Pizza</span>]) {
-        <span class="hljs-keyword">self</span>.result = .success(pizzas)
+    <span class="hljs-function"><span class="hljs-keyword">init</span>(<span class="hljs-params">pizzas</span>: [<span class="hljs-type">Pizza</span>])</span> {
+        <span class="hljs-keyword">self</span>.result <span class="hljs-operator">=</span> .success(pizzas)
     }
 
-    <span class="hljs-keyword">init</span>(error: <span class="hljs-type">PizzaAPIError</span>) {
-        <span class="hljs-keyword">self</span>.result = .failure(error)
+    <span class="hljs-function"><span class="hljs-keyword">init</span>(<span class="hljs-params">error</span>: <span class="hljs-type">PizzaAPIError</span>)</span> {
+        <span class="hljs-keyword">self</span>.result <span class="hljs-operator">=</span> .failure(error)
     }
 
-    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">getPizzas</span><span class="hljs-params">(<span class="hljs-number">_</span> completion: <span class="hljs-params">(Result&lt;[Pizza], PizzaAPIError&gt;)</span></span></span> -&gt; <span class="hljs-type">Void</span>) {
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">getPizzas</span>(<span class="hljs-keyword">_</span> <span class="hljs-params">completion</span>: (<span class="hljs-type">Result</span>&lt;[<span class="hljs-type">Pizza</span>], <span class="hljs-type">PizzaAPIError</span>&gt;) -&gt; <span class="hljs-type">Void</span>)</span> {
         completion(result)
     }
-}
-</code></pre>
+}</code></pre>
 <h2 id="spy">Spy</h2>
 <p>A spy is a test double you can use to <strong>inspect the output produced by the system under test</strong>.</p>
 <p>Spies are the opposite of stubs. When the system under test performs a side effect on a dependency you can use a spy to record the effect and then verify it matches the expected behaviour.</p>
 <p>For example, every one is implementing Dark Mode in their iOS apps nowadays. Say you want to test <code>SettingsController</code>, the component which your settings view controller uses to relay the user interaction with the UI.</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SettingsController</span> </span>{
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SettingsController</span> </span>{
 
     <span class="hljs-comment">// ...</span>
 
-    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">set</span><span class="hljs-params">(darkModeEnabled enabled: Bool)</span></span> {
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">set</span>(<span class="hljs-params">darkModeEnabled</span> <span class="hljs-params">enabled</span>: <span class="hljs-type">Bool</span>)</span> {
         <span class="hljs-keyword">if</span> enabled {
             layoutManager.paintDarkMode()
         } <span class="hljs-keyword">else</span> {
             layoutManager.paintLightMode()
         }
 
-        settingsStorage.<span class="hljs-keyword">set</span>(darkModeEnabled: enabled)
+        settingsStorage.set(darkModeEnabled: enabled)
     }
-}
-</code></pre>
+}</code></pre>
 <p>The behaviour you want to test is that <code>SettingsController</code> correctly stores the dark mode preference. You can provide a spy for the storage layer, and make sure the right value is put there.</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SettingsStorageSpy</span>: <span class="hljs-title">SettingsStorage</span> </span>{
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SettingsStorageSpy</span>: <span class="hljs-title">SettingsStorage</span> </span>{
 
-    <span class="hljs-keyword">private</span>(<span class="hljs-keyword">set</span>) <span class="hljs-keyword">var</span> darkModeEnabled: <span class="hljs-type">Bool?</span>
+    <span class="hljs-keyword">private(set)</span> <span class="hljs-keyword">var</span> darkModeEnabled: <span class="hljs-type">Bool</span>?
 
-    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">set</span><span class="hljs-params">(darkModeEnabled enabled: Bool)</span></span> {
-        <span class="hljs-keyword">self</span>.darkModeEnabled = enabled
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">set</span>(<span class="hljs-params">darkModeEnabled</span> <span class="hljs-params">enabled</span>: <span class="hljs-type">Bool</span>)</span> {
+        <span class="hljs-keyword">self</span>.darkModeEnabled <span class="hljs-operator">=</span> enabled
     }
-}
-</code></pre>
+}</code></pre>
 <p>Notice how <code>darkModeEnabled</code> is an <code>Optional</code> <code>Bool</code>. This will allow you to test whether the value is set at all. If your test will read a <code>.none</code> for <code>darkModeEnabled</code> you&#39;ll know your code didn&#39;t call <code>set(darkModeEnabled:)</code>.</p>
 <p>This is how to use the spy:</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testSettingDarkMode</span><span class="hljs-params">()</span></span> {
-    <span class="hljs-keyword">let</span> spy = <span class="hljs-type">SettingsStorageSpy</span>()
-    <span class="hljs-keyword">let</span> controller = <span class="hljs-type">SettingsController</span>(
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testSettingDarkMode</span>()</span> {
+    <span class="hljs-keyword">let</span> spy <span class="hljs-operator">=</span> <span class="hljs-type">SettingsStorageSpy</span>()
+    <span class="hljs-keyword">let</span> controller <span class="hljs-operator">=</span> <span class="hljs-type">SettingsController</span>(
         layoutManager: <span class="hljs-type">LayoutManagerDummy</span>(),
         settingsStorage: spy
     )
 
-    controller.<span class="hljs-keyword">set</span>(darkModeEnabled: <span class="hljs-literal">true</span>)
+    controller.set(darkModeEnabled: <span class="hljs-literal">true</span>)
 
-    expect(spy.darkModeEnabled) == <span class="hljs-literal">true</span>
-}
-</code></pre>
+    expect(spy.darkModeEnabled) <span class="hljs-operator">==</span> <span class="hljs-literal">true</span>
+}</code></pre>
 <p>Notice how we passed a dummy for the <code>LayoutManager</code> input parameter. <code>SettingsController</code> needs a <code>LayoutManager</code> value to initialize, but our test doesn&#39;t care about how it interacts with it, so we can pass a dummy.</p>
-<h2 id="what-about-mocks-">What about mocks?</h2>
+<h2 id="what-about-mocks">What about mocks?</h2>
 <p>If you are reading about unit testing sooner or later you&#39;ll come across the &quot;mock&quot; word. Mock is a word bloated with meaning in the testing vocabulary.</p>
 <p>Martin Fowler <a href="https://martinfowler.com/bliki/TestDouble.html">refers to mocks</a> as doubles that are &quot;pre-programmed with expectations which form a specification of the calls they are expected to receive. They can throw an exception if they receive a call they don&#39;t expect and are checked during verification to ensure they got all the calls they were expecting.&quot;</p>
 <p>If you are working on a dynamic language chances are there&#39;s a mocking framework for it. Objective-C has <a href="http://ocmock.org/">OCMock</a>, JavaScript has <a href="https://mochajs.org/">Mocha</a> and <a href="https://sinonjs.org/">Sinon</a>, Ruby has <a href="https://github.com/rspec/rspec-mocks">rspec-mock</a>, just to name a few. All these frameworks are powerful and flexible, they provide a way to build not only mocks, but stubs, fakes, and spies too.</p>

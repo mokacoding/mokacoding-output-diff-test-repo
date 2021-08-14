@@ -8,25 +8,24 @@ We can define the view model as a type <em>within</em> the view.</p>
 <h2 id="nested-type-view-model">Nested Type View Model</h2>
 <p>Nested types allow us to &quot;nest supporting enumerations, classes, and structures within the definition of the type they support.&quot;</p>
 <p>When there is a 1-to-1 relationship between a view and view model, when the view model supports a single view, a nested type is a great way to make that relationship explicit.</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">BookDetail</span>: <span class="hljs-title">View</span> </span>{
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">BookDetail</span>: <span class="hljs-title">View</span> </span>{
 
-    @<span class="hljs-type">ObservedObject</span> <span class="hljs-keyword">private</span>(<span class="hljs-keyword">set</span>) <span class="hljs-keyword">var</span> viewModel: <span class="hljs-type">ViewModel</span>
+    <span class="hljs-meta">@ObservedObject</span> <span class="hljs-keyword">private(set)</span> <span class="hljs-keyword">var</span> viewModel: <span class="hljs-type">ViewModel</span>
 
-    <span class="hljs-keyword">var</span> body: some <span class="hljs-type">View</span> { ... }
+    <span class="hljs-keyword">var</span> body: <span class="hljs-keyword">some</span> <span class="hljs-type">View</span> { <span class="hljs-operator">...</span> }
 }
 
 <span class="hljs-class"><span class="hljs-keyword">extension</span> <span class="hljs-title">BookDetail</span> </span>{
 
-    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ViewModel</span>: <span class="hljs-title">ObservableObject</span> </span>{ ... }
-}
-</code></pre>
+    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ViewModel</span>: <span class="hljs-title">ObservableObject</span> </span>{ <span class="hljs-operator">...</span> }
+}</code></pre>
 <p>You can find a working example of this code in action <a href="https://github.com/mokagio/ReadingList">on GitHub</a>.</p>
 <p>Thanks to the nested type, the full name of the view model is <code>BookDetail.ViewModel</code>.
 This makes it obvious at a semantic level that the view model is related to <code>BookDetail</code>.</p>
 <p>You could argue that <code>BookDetail.ViewModel</code> is not that different from <code>BookDetailViewModel</code>.
 Plus, since Xcode has fuzzy auto-completion – <em>when it works, that is</em> – there is no difference when typing the two.</p>
 <p>While that&#39;s all true, this approach has some advantages compared to keeping the two concepts in unrelated types.</p>
-<h2 id="advantages-clearer-and-less-error-prone">Advantages — Clearer and less error-prone</h2>
+<h2 id="advantages--clearer-and-less-error-prone">Advantages — Clearer and less error-prone</h2>
 <p>First of all, it&#39;s worth reiterating that using a nested type makes the relationship between the two types more evident than merely relying on their names.
 I feel this modeling expresses the design at <a href="https://mokacoding.com/blog/pipe-wrench/">a more precise level</a>, making it easier to understand the code.</p>
 <p>Within the view definition, we can reference the view model just as <code>ViewModel</code>, which leaves the code more compact.</p>
@@ -53,7 +52,7 @@ If you do that, then a fuzzy query like &quot;bdvm&quot; will bring up <code>Boo
 <br></p>
 <p>Extracting the view models in dedicated files is something you&#39;d probably want to do anyways to keep the domains separated and avoid the chance of merge conflicts when two developers are working on the view and the view model in parallel on different branches.
 Still, it&#39;s annoying to <em>have to</em> do it to find the objects efficiently.</p>
-<h2 id="yay-or-nay-">Yay or Nay?</h2>
+<h2 id="yay-or-nay">Yay or Nay?</h2>
 <p>None of the advantages of using nested types for view models are life-changing.
 This approach won&#39;t make your app better from a functionality point of view, nor will it save you time or reduce the chance of making mistakes.
 It&#39;s all <em>syntax sugar</em>, at best.</p>

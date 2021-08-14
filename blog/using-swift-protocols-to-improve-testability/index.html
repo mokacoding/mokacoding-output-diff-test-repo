@@ -16,85 +16,80 @@ test data you put into it is removed once the tests are finished. This option
 is slow and error prone.</p>
 <p>A better option is to use a protocol to abstract the dependency and gain more
 control on your tests.</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">protocol</span> <span class="hljs-title">CookieProvider</span> </span>{
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">protocol</span> <span class="hljs-title">CookieProvider</span> </span>{
 
-    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">cookieWithName</span><span class="hljs-params">(name: String)</span></span> -&gt; <span class="hljs-type">NSHTTPCookie?</span>
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">cookieWithName</span>(<span class="hljs-params">name</span>: <span class="hljs-type">String</span>)</span> -&gt; <span class="hljs-type">NSHTTPCookie</span>?
 
-    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">setCookie</span><span class="hljs-params">(cookie: NSHTTPCookie)</span></span>
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">setCookie</span>(<span class="hljs-params">cookie</span>: <span class="hljs-type">NSHTTPCookie</span>)</span>
 
-    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">deleteCookieWithName</span><span class="hljs-params">(name: String)</span></span>
-}
-</code></pre>
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">deleteCookieWithName</span>(<span class="hljs-params">name</span>: <span class="hljs-type">String</span>)</span>
+}</code></pre>
 <p>The components depending on the cookie storage will now expect an instance
 conforming to the <code>CookieProvider</code> protocol rather that specifying and actual
 class.</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">NetworkClient</span> </span>{
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">NetworkClient</span> </span>{
 
     <span class="hljs-keyword">let</span> cookiesProvider: <span class="hljs-type">CookieProvider</span>
 
-    <span class="hljs-keyword">init</span>(cookiesProvider: <span class="hljs-type">CookieProvider</span>) {
-        <span class="hljs-keyword">self</span>.cookiesProvider = cookiesProvider
+    <span class="hljs-function"><span class="hljs-keyword">init</span>(<span class="hljs-params">cookiesProvider</span>: <span class="hljs-type">CookieProvider</span>)</span> {
+        <span class="hljs-keyword">self</span>.cookiesProvider <span class="hljs-operator">=</span> cookiesProvider
     }
-}
-</code></pre>
+}</code></pre>
 <p>In your tests you can implement a test double cookie provider able to return
 a cookie set by you, and to store a cookie in memory so that you can verify
 if.</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CookieProviderTestDouble</span>: <span class="hljs-title">CookieProvider</span> </span>{
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CookieProviderTestDouble</span>: <span class="hljs-title">CookieProvider</span> </span>{
 
-    <span class="hljs-keyword">var</span> cookies: [<span class="hljs-type">NSHTTPCookie</span>]?
+    <span class="hljs-keyword">var</span> cookies: [<span class="hljs-type">NSHTTPCookie</span>]<span class="hljs-operator">?</span>
 
-    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">cookieWithName</span><span class="hljs-params">(name: String)</span></span> -&gt; <span class="hljs-type">NSHTTPCookie?</span> {
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">cookieWithName</span>(<span class="hljs-params">name</span>: <span class="hljs-type">String</span>)</span> -&gt; <span class="hljs-type">NSHTTPCookie</span>? {
         <span class="hljs-keyword">return</span> cookies
-            .<span class="hljs-built_in">filter</span> { $<span class="hljs-number">0</span>.name == name }
+            .filter { <span class="hljs-variable">$0</span>.name <span class="hljs-operator">==</span> name }
             .first
     }
 
-    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">setCookie</span><span class="hljs-params">(cookie: NSHTTPCookie)</span></span>
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">setCookie</span>(<span class="hljs-params">cookie</span>: <span class="hljs-type">NSHTTPCookie</span>)</span>
         <span class="hljs-keyword">self</span>.cookies.append(cookie)
     }
 
-    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">deleteFooBarCoockie</span><span class="hljs-params">()</span></span> {
-        <span class="hljs-keyword">guard</span> <span class="hljs-keyword">let</span> cookie = cookieWithName(name) <span class="hljs-keyword">else</span> {
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">deleteFooBarCoockie</span>()</span> {
+        <span class="hljs-keyword">guard</span> <span class="hljs-keyword">let</span> cookie <span class="hljs-operator">=</span> cookieWithName(name) <span class="hljs-keyword">else</span> {
             <span class="hljs-keyword">return</span>
         }
 
         deleteCookie(cookie)
     }
-}
-</code></pre>
+}</code></pre>
 <p>You can then init the <code>NetworkClient</code> using the test double:</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">let</span> cookiesProvider = <span class="hljs-type">CookieProviderTestDouble</span>()
-<span class="hljs-keyword">let</span> systemUnderTest = <span class="hljs-type">NetworkClient</span>(cookiesProvider: cookiesProvider)
-</code></pre>
+<pre><code class="hljs swift"><span class="hljs-keyword">let</span> cookiesProvider <span class="hljs-operator">=</span> <span class="hljs-type">CookieProviderTestDouble</span>()
+<span class="hljs-keyword">let</span> systemUnderTest <span class="hljs-operator">=</span> <span class="hljs-type">NetworkClient</span>(cookiesProvider: cookiesProvider)</code></pre>
 <p>This will empower you to test the network client behaviour that depends on the
 value of a cookie by simply setting it in your <code>CookieProviderTestDouble</code>
 instance, as well as testing behaviour that results in a cookie being stored
 by checking the values in the <code>.cookies</code> property of the test double.</p>
 <p>In your production code you will then have to extend <code>NSHTTPCookieStorage</code> to
 conform to <code>CookieProvider</code>:</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">let</span> apiURL: <span class="hljs-type">NSURL</span> = ...
+<pre><code class="hljs swift"><span class="hljs-keyword">let</span> apiURL: <span class="hljs-type">NSURL</span> <span class="hljs-operator">=</span> <span class="hljs-operator">...</span>
 
 <span class="hljs-class"><span class="hljs-keyword">extension</span> <span class="hljs-title">NSHTTPCookieStorage</span>: <span class="hljs-title">CookieProvider</span> </span>{
 
-    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">cookieWithName</span><span class="hljs-params">(name: String)</span></span> -&gt; <span class="hljs-type">NSHTTPCookie?</span> {
-        <span class="hljs-keyword">return</span> cookiesForURL(apiURL)?
-            .<span class="hljs-built_in">filter</span> { $<span class="hljs-number">0</span>.name == name }
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">cookieWithName</span>(<span class="hljs-params">name</span>: <span class="hljs-type">String</span>)</span> -&gt; <span class="hljs-type">NSHTTPCookie</span>? {
+        <span class="hljs-keyword">return</span> cookiesForURL(apiURL)<span class="hljs-operator">?</span>
+            .filter { <span class="hljs-variable">$0</span>.name <span class="hljs-operator">==</span> name }
             .first
     }
 
     <span class="hljs-comment">// A method called setCookie is already exposed by NSHTTPCookieStorage.</span>
     <span class="hljs-comment">// Less work :)</span>
 
-    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">deleteCookieWithName</span><span class="hljs-params">(name: String)</span></span> {
-        <span class="hljs-keyword">guard</span> <span class="hljs-keyword">let</span> cookie = cookieWithName(name) <span class="hljs-keyword">else</span> {
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">deleteCookieWithName</span>(<span class="hljs-params">name</span>: <span class="hljs-type">String</span>)</span> {
+        <span class="hljs-keyword">guard</span> <span class="hljs-keyword">let</span> cookie <span class="hljs-operator">=</span> cookieWithName(name) <span class="hljs-keyword">else</span> {
             <span class="hljs-keyword">return</span>
         }
 
         deleteCookie(cookie)
     }
-}
-</code></pre>
+}</code></pre>
 <h2 id="pros">Pros</h2>
 <p>This approach simplifies testability, and potentially makes your unit tests
 faster in case the third party code you are dealing with performs I/O operations.</p>

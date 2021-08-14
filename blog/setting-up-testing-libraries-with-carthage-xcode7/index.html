@@ -6,22 +6,18 @@
 <h2 id="carthage">Carthage</h2>
 <p>Carthage is a very interesting dependency manager. It is written in Swift and does massive use of <a href="https://github.com/ReactiveCocoa/ReactiveCocoa">ReactiveCocoa</a>, and its approach is focused on <strong>simplicity</strong>. Where CocoaPods does everything for us, Carthage only resolves, downloads, and -when necessary- builds dependencies, leaving us the responsibility of adding them to the project, using the methods and settings we find more appropriate.</p>
 <p>You can install Carthage using <a href="http://brew.sh/">Homebrew</a>:</p>
-<pre><code class=" hljs bash">brew install carthage
-</code></pre>
+<pre><code class="hljs bash">brew install carthage</code></pre>
 <h2 id="the-cartfile">The Cartfile</h2>
 <p>The way to specify the dependencies in Carthage is with a <code>Cartfile</code>. This is how our looks like:</p>
-<pre><code class=""><span class="hljs-attribute">github</span> <span class="hljs-string">&quot;Quick/Quick&quot;</span> <span class="hljs-string">&quot;v0.5.0&quot;</span>
-github <span class="hljs-string">&quot;Quick/Nimble&quot;</span> <span class="hljs-string">&quot;v2.0.0-rc.1&quot;</span>
-</code></pre><p>Note how we are specifying exact version numbers. This is because Swift 2 support has been added only in those version, and being all a work in progress we want to make sure we use a <em>stable</em> version.</p>
+<pre><code><span class="hljs-attribute">github</span> <span class="hljs-string">&quot;Quick/Quick&quot;</span> <span class="hljs-string">&quot;v0.5.0&quot;</span>
+github <span class="hljs-string">&quot;Quick/Nimble&quot;</span> <span class="hljs-string">&quot;v2.0.0-rc.1&quot;</span></code></pre><p>Note how we are specifying exact version numbers. This is because Swift 2 support has been added only in those version, and being all a work in progress we want to make sure we use a <em>stable</em> version.</p>
 <p>The Cartfile supports the usual operators for version requirements such as <code>~&gt;</code>, <code>&gt;=</code>, etc. You can read more about all the valid options <a href="https://github.com/Carthage/Carthage/blob/master/Documentation/Artifacts.md#cartfile">here</a></p>
 <h2 id="getting-the-frameworks">Getting the frameworks</h2>
 <p>Resolving the dependencies, download the right versions, and finally build them is as easy as running a single command:</p>
-<pre><code class=" hljs bash">carthage update
-</code></pre>
+<pre><code class="hljs bash">carthage update</code></pre>
 <p>But since we are installing frameworks using Swift 2, we need to switch the sdk used by <code>xcodebuild</code>, which is call by <code>carthage update</code> under the hood, to the Xcode 7 one, like this:</p>
-<pre><code class=" hljs bash">sudo xcode-select --switch /Applications/Xcode-beta.app/Contents/Developer
-carthage update
-</code></pre>
+<pre><code class="hljs bash">sudo xcode-select --switch /Applications/Xcode-beta.app/Contents/Developer
+carthage update</code></pre>
 <p>Once <code>carthage update</code> has finished you will notice a <code>Carthage</code> folder, and a <code>Cathage.resolved</code> file. Remember to check-in to version control at least the <code>Carthage.resolved</code> file.</p>
 <p>It&#39;s now time to import the frameworks into Xcode. Because we are only setting <em>testing depencendcies</em> we should add the to the test target only. To do that need to follow a different approach than the usual one. Quoting from Carthage&#39;s README:</p>
 <blockquote>
@@ -30,39 +26,37 @@ carthage update
 <p><img src="https://s3.amazonaws.com/mokacoding/2015-07-21-carthage-link-binaries-small.gif" alt="Link Binaries animated screenshot"></p>
 <h2 id="just-another-bit-of-setup">Just another bit of setup</h2>
 <p>When building for iOS, due to an App Store bug we need to add a &quot;Run Script&quot; Build Phase, that will execute a script to work around the issue. This is the Run Script&#39;s content:</p>
-<pre><code class=""><span class="hljs-regexp">/usr/</span>local<span class="hljs-regexp">/bin/</span>carthage <span class="hljs-keyword">copy</span>-frameworks
-</code></pre><p>And these are the paths to our frameworks:</p>
-<pre><code class="">$(SRCROOT)<span class="hljs-regexp">/Carthage/</span>Build<span class="hljs-regexp">/iOS/</span>Quick.framework
-$(SRCROOT)<span class="hljs-regexp">/Carthage/</span>Build<span class="hljs-regexp">/iOS/</span>Nimble.framework
-</code></pre><p><img src="https://s3.amazonaws.com/mokacoding/2015-07-21-carthage-run-script-small.gif" alt="Run script animated screenshot"></p>
+<pre><code><span class="hljs-regexp">/usr/</span>local<span class="hljs-regexp">/bin/</span>carthage <span class="hljs-keyword">copy</span>-frameworks</code></pre><p>And these are the paths to our frameworks:</p>
+<pre><code>$(SRCROOT)<span class="hljs-regexp">/Carthage/</span>Build<span class="hljs-regexp">/iOS/</span>Quick.framework
+$(SRCROOT)<span class="hljs-regexp">/Carthage/</span>Build<span class="hljs-regexp">/iOS/</span>Nimble.framework</code></pre><p><img src="https://s3.amazonaws.com/mokacoding/2015-07-21-carthage-run-script-small.gif" alt="Run script animated screenshot"></p>
 <p>You can read more about the process <a href="https://github.com/Carthage/Carthage#if-youre-building-for-ios">here</a>.</p>
 <p>After that, we need to add the Carthage&#39;s build folder (<code>$(SRCROOT)/Carthage/Build/iOS</code>) to Framework Search Path, in recursive mode. This is apparently due to a regression (or is it a feature?) introduced by Xcode 7, more <a href="https://github.com/Quick/Quick/issues/347">here</a>.</p>
 <p><img src="https://s3.amazonaws.com/mokacoding/2015-07-21-carthage-search-path-small.png" alt="Framework Search Path screenshot">
 Once that is done we can happily import our testing frameworks in the test target:</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">import</span> Quick
+<pre><code class="hljs swift"><span class="hljs-keyword">import</span> Quick
 <span class="hljs-keyword">import</span> Nimble
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">QuickNimbleCarthageSpec</span>: <span class="hljs-title">QuickSpec</span> </span>{
-  <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">spec</span><span class="hljs-params">()</span></span> {
+  <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">spec</span>()</span> {
     describe(<span class="hljs-string">&quot;Setting up Quick and Nimble for testing using Carthage&quot;</span>) {
       it(<span class="hljs-string">&quot;is not very hard&quot;</span>) {
         expect(<span class="hljs-literal">true</span>).to(beTruthy())
       }
 
       it(<span class="hljs-string">&quot;works very well&quot;</span>) {
-        expect(<span class="hljs-number">20</span> * <span class="hljs-number">2</span> + <span class="hljs-number">3</span> - <span class="hljs-number">1</span>).to(<span class="hljs-built_in">equal</span>(<span class="hljs-number">42</span>))
+        expect(<span class="hljs-number">20</span> <span class="hljs-operator">*</span> <span class="hljs-number">2</span> <span class="hljs-operator">+</span> <span class="hljs-number">3</span> <span class="hljs-operator">-</span> <span class="hljs-number">1</span>).to(equal(<span class="hljs-number">42</span>))
       }
     }
   }
-}
-</code></pre>
+}</code></pre>
 <p><img src="https://s3.amazonaws.com/mokacoding/2015-07-21-test-succeeded.png" alt="Test succeded screenshot"></p>
 <h2 id="protip-make-them-private">Protip: Make them private</h2>
 <p>Since the frameworks used in the testing target do not concern the main one there is no reason to make their dependencies known to the parent project. To do this we simply have to declare those dependencies in the <code>Cartfile.private</code> file. Quoting from Carthage&#39;s docs:</p>
-<pre><code class=" hljs bash">mv Cartfile Cartfile.private
-</code></pre>
+<pre><code class="hljs bash">mv Cartfile Cartfile.private</code></pre>
 <blockquote>
 <p>Frameworks that want to include dependencies via Carthage, but do not want to force those dependencies on parent projects, can list them in the optional Cartfile.private file, identically to how they would be specified in the main Cartfile.</p>
+</blockquote>
+<blockquote>
 <p>Anything listed in the private Cartfile will not be seen by dependent (parent) projects, which is useful for dependencies that may be important during development, but not when building releases—for example, test frameworks.</p>
 </blockquote>
 <hr>

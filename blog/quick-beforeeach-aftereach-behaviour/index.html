@@ -2,10 +2,10 @@
   [What is your biggest struggle right now with building software?](https://goo.gl/forms/lCLlJd9hqCUYoTME2)--><p><a href="https://tddinswift.com?utm_source=mokacoding-site&amp;utm_campaign=coming-soon&amp;utm_medium=sticky-header">Avilable Now: <strong>Test-Driven Development in Swift with SwiftUI and Combine</strong></a></p>
 </p></div></div></div></div><div class="page"><div class="row-12"><div class="col-12 header"><h1 class="brand"><a href="/">mokacoding</a></h1><div class="punchline">unit and acceptance testing, automation, productivity</div><div class="links"><a href="/archive.html">Archive</a><a href="/tags.html">Tags</a><a href="https://gio.codes">About</a><a href="#subscribe">Subscribe</a><a href="/feed.xml"><i class="fa fa-rss"></i></a></div></div><div class="col-12"><div class="post-container"><h2 class="post-title"><a href="/blog/quick-beforeeach-aftereach-behaviour">Quick beforeEach and afterEach behaviour</a></h2><p class="post-meta"><span class="post-date">Mon May 08 2017&nbsp;</span><a href="/tag/Quick/index.html" class="post-tag">-Quick</a><a href="/tag/Espresso/index.html" class="post-tag">-Espresso</a><a href="/tag/Testing/index.html" class="post-tag">-Testing</a></p><div class="post"><p>I am sometimes unsure of what to expect from nested <code>beforeEach</code> and/or <code>afterEach</code> calls in Quick.</p>
 <p>Luckily we can verify how they behave with a simple example spec, which you can find <a href="https://github.com/mokacoding/quick-beforeeach-aftereach-behaviour">on GitHub</a>:</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">import</span> Quick
+<pre><code class="hljs swift"><span class="hljs-keyword">import</span> Quick
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Spec</span>: <span class="hljs-title">QuickSpec</span> </span>{
-  <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">spec</span><span class="hljs-params">()</span></span> {
+  <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">spec</span>()</span> {
     describe(<span class="hljs-string">&quot;beforeEach and afterEach behaviour&quot;</span>) {
       beforeEach {
         <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;⭐️ top before each&quot;</span>)
@@ -46,10 +46,9 @@
       }
     }
   }
-}
-</code></pre>
+}</code></pre>
 <p>If we run this test the console output, cleared of all the test framework information, will be:</p>
-<pre><code class="">behaviour - <span class="hljs-keyword">some</span> context - example <span class="hljs-number">1</span>
+<pre><code>behaviour - <span class="hljs-keyword">some</span> context - example <span class="hljs-number">1</span>
 ⭐️ top <span class="hljs-keyword">before</span> <span class="hljs-keyword">each</span>
 👉 context <span class="hljs-keyword">before</span> <span class="hljs-keyword">each</span>
 😊 example <span class="hljs-number">1</span>
@@ -82,8 +81,7 @@ behaviour - other context - example <span class="hljs-number">2</span>
 🍎 context <span class="hljs-keyword">before</span> <span class="hljs-keyword">each</span>
 😜 example <span class="hljs-number">2</span>
 🍎 context <span class="hljs-keyword">after</span> <span class="hljs-keyword">each</span>
-⭐️ top <span class="hljs-keyword">after</span> <span class="hljs-keyword">each</span>
-</code></pre><p>This shows us that all and only the <code>beforeEach</code> and <code>afterEach</code> encountered in the path from the start of the spec are run before and after each <code>it</code> block is executed.</p>
+⭐️ top <span class="hljs-keyword">after</span> <span class="hljs-keyword">each</span></code></pre><p>This shows us that all and only the <code>beforeEach</code> and <code>afterEach</code> encountered in the path from the start of the spec are run before and after each <code>it</code> block is executed.</p>
 <p>That&#39;s important to keep in mind and can open the door to some interesting simplifications of how the spec is written.</p>
 <hr>
 <p><em>I set out to write this post to share what I thought was a gotcha with the behaviour of <code>beforeEach</code> and <code>afterEach</code> have in <a href="https://github.com/quick/quick">Quick</a>, but the <a href="https://github.com/mokacoding/quick-beforeeach-aftereach-behaviour">example project</a> that I made to verify it revealed that my mental model was incorrect. That&#39;s for the best, as the actual behaviour is better than what I thought it was.</em></p>

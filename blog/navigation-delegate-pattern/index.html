@@ -6,54 +6,51 @@ You need to wrap your view controller under test in a <code>UINavigationControll
 There are usually animations involved, which in turn require either your test assertions to be asynchronous or your code to allow the <code>animated</code> flag to be injected as <code>false</code> from the tests.</p>
 <p>Those and other little gotchas make the tests harder to write and reason about, but it doesn&#39;t have to be so.</p>
 <p>You can use a simple and cheap pattern to easily test how your view controllers trigger navigation, making your code easier to work with in the process.</p>
-<h2 id="-navigationdelegate-"><code>NavigationDelegate</code></h2>
+<h2 id="navigationdelegate"><code>NavigationDelegate</code></h2>
 <p>The key to make navigations between view controllers easy to test lies in appreciating that <strong>view controllers be responsible for presenting other view controllers</strong>.</p>
 <p>View controllers should only trigger the navigation and then <em>delegate</em> the act of performing it to another object.
 I like to call this kind of delegates <code>NavigationDelegate</code>s<a href="#fn1"><sup id="pattern-origin">*</sup></a>.</p>
 <p>With a <code>NavigationDelegate</code> in place, testing how a view controller does navigations is now a matter of testing how it interacts with its delegate.
 This can be done by using a <a href="https://mokacoding.com/blog/swift-test-doubles/#spy">spy</a>.</p>
-<h3 id="-navigationdelegate-in-action"><code>NavigationDelegate</code> in action</h3>
+<h3 id="navigationdelegate-in-action"><code>NavigationDelegate</code> in action</h3>
 <p>To test that a view controller triggers the expected navigation you can verify that it calls the appropriate method of its <code>NavigationDelegate</code>.</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testCallsShowRedWhenRedButtonTouched</span><span class="hljs-params">()</span></span> {
-    <span class="hljs-keyword">let</span> viewController = loadViewController()
-    <span class="hljs-keyword">let</span> navigationDelegateSpy = <span class="hljs-type">ViewControllerNavigationDelegateSpy</span>()
-    viewController.navigationDelegate = navigationDelegateSpy
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testCallsShowRedWhenRedButtonTouched</span>()</span> {
+    <span class="hljs-keyword">let</span> viewController <span class="hljs-operator">=</span> loadViewController()
+    <span class="hljs-keyword">let</span> navigationDelegateSpy <span class="hljs-operator">=</span> <span class="hljs-type">ViewControllerNavigationDelegateSpy</span>()
+    viewController.navigationDelegate <span class="hljs-operator">=</span> navigationDelegateSpy
 
-    viewController.redButton.sendActions(<span class="hljs-keyword">for</span>: .touchUpInside)
+    viewController.redButton.sendActions(for: .touchUpInside)
 
     <span class="hljs-type">XCTAssertTrue</span>(navigationDelegateSpy.showRedCalled)
-}
-</code></pre>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">protocol</span> <span class="hljs-title">ViewControllerNavigationDelegate</span>: <span class="hljs-title">class</span> </span>{
-    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">showRedViewController</span><span class="hljs-params">()</span></span>
+}</code></pre>
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">protocol</span> <span class="hljs-title">ViewControllerNavigationDelegate</span>: <span class="hljs-title">class</span> </span>{
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">showRedViewController</span>()</span>
 }
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ViewController</span>: <span class="hljs-title">UIViewController</span> </span>{
 
-    <span class="hljs-meta">@IBOutlet</span> <span class="hljs-keyword">weak</span> <span class="hljs-keyword">var</span> redButton: <span class="hljs-type">UIButton!</span>
+    <span class="hljs-keyword">@IBOutlet</span> <span class="hljs-keyword">weak</span> <span class="hljs-keyword">var</span> redButton: <span class="hljs-type">UIButton</span>!
 
-    <span class="hljs-keyword">weak</span> <span class="hljs-keyword">var</span> navigationDelegate: <span class="hljs-type">ViewControllerNavigationDelegate?</span>
+    <span class="hljs-keyword">weak</span> <span class="hljs-keyword">var</span> navigationDelegate: <span class="hljs-type">ViewControllerNavigationDelegate</span>?
 
-    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">viewDidLoad</span><span class="hljs-params">()</span></span> {
+    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">viewDidLoad</span>()</span> {
         <span class="hljs-keyword">super</span>.viewDidLoad()
 
-        redButton.addTarget(<span class="hljs-keyword">self</span>, action: #selector(redButtonTouched), <span class="hljs-keyword">for</span>: .primaryActionTriggered)
+        redButton.addTarget(<span class="hljs-keyword">self</span>, action: #selector(redButtonTouched), for: .primaryActionTriggered)
     }
 
-    <span class="hljs-meta">@objc</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">redButtonTouched</span><span class="hljs-params">()</span></span> {
-        navigationDelegate?.showRedViewController()
+    <span class="hljs-keyword">@objc</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">redButtonTouched</span>()</span> {
+        navigationDelegate<span class="hljs-operator">?</span>.showRedViewController()
     }
-}
-</code></pre>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ViewControllerNavigationDelegateSpy</span>: <span class="hljs-title">ViewControllerNavigationDelegate</span> </span>{
+}</code></pre>
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ViewControllerNavigationDelegateSpy</span>: <span class="hljs-title">ViewControllerNavigationDelegate</span> </span>{
 
-    <span class="hljs-keyword">private</span>(<span class="hljs-keyword">set</span>) <span class="hljs-keyword">var</span> showRedCalled = <span class="hljs-literal">false</span>
+    <span class="hljs-keyword">private(set)</span> <span class="hljs-keyword">var</span> showRedCalled <span class="hljs-operator">=</span> <span class="hljs-literal">false</span>
 
-    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">showRedViewController</span><span class="hljs-params">()</span></span> {
-        showRedCalled = <span class="hljs-literal">true</span>
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">showRedViewController</span>()</span> {
+        showRedCalled <span class="hljs-operator">=</span> <span class="hljs-literal">true</span>
     }
-}
-</code></pre>
+}</code></pre>
 <p><em>All the this code is available in <a href="https://github.com/mokagio/Navigation-Delegate-Example">this GitHub repo</a></em>.</p>
 <p>The tests above look simple, don&#39;t they?
 By using this pattern, you remove the need to set up the whole navigation stack containing the view controller under test to verify it&#39;s behavior.
@@ -61,22 +58,21 @@ You also don&#39;t need to put the view controller inside a <code>UIWindow</code
 <p>The only downside is that you have to build a spy test double for the <code>NavigationDelegate</code>.
 Given how little code this involves, I think it&#39;s a pretty good tradeoff.</p>
 <p>If you want to test how the type conforming to the <code>NavigationDelegate</code> performs the navigation -a wise thing to do- you can do that in isolation.</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testPushesRedViewController</span><span class="hljs-params">()</span></span> {
-    <span class="hljs-keyword">let</span> navigator = <span class="hljs-type">Navigator</span>(navigationController: <span class="hljs-type">UINavigationController</span>(rootViewController: <span class="hljs-type">UIViewController</span>()))
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testPushesRedViewController</span>()</span> {
+    <span class="hljs-keyword">let</span> navigator <span class="hljs-operator">=</span> <span class="hljs-type">Navigator</span>(navigationController: <span class="hljs-type">UINavigationController</span>(rootViewController: <span class="hljs-type">UIViewController</span>()))
 
     navigator.showRedViewController()
 
-    <span class="hljs-number">_</span> = expectation(
-        <span class="hljs-keyword">for</span>: <span class="hljs-type">NSPredicate</span> { input, <span class="hljs-number">_</span> <span class="hljs-keyword">in</span>
-            <span class="hljs-keyword">return</span> (input <span class="hljs-keyword">as</span>? <span class="hljs-type">UINavigationController</span>)?.topViewController <span class="hljs-keyword">is</span> <span class="hljs-type">RedViewController</span>
+    <span class="hljs-keyword">_</span> <span class="hljs-operator">=</span> expectation(
+        for: <span class="hljs-type">NSPredicate</span> { input, <span class="hljs-keyword">_</span> <span class="hljs-keyword">in</span>
+            <span class="hljs-keyword">return</span> (input <span class="hljs-keyword">as?</span> <span class="hljs-type">UINavigationController</span>)<span class="hljs-operator">?</span>.topViewController <span class="hljs-keyword">is</span> <span class="hljs-type">RedViewController</span>
         },
         evaluatedWith: navigator.navigationController,
-        handler: .<span class="hljs-keyword">none</span>
+        handler: .none
     )
-    waitForEnavigatorpectations(timeout: <span class="hljs-number">1</span>, handler: .<span class="hljs-keyword">none</span>)
-}
-</code></pre>
-<h2 id="you-can-adopt-navigationdelegate-s-today">You can adopt <code>NavigationDelegate</code>s today</h2>
+    waitForEnavigatorpectations(timeout: <span class="hljs-number">1</span>, handler: .none)
+}</code></pre>
+<h2 id="you-can-adopt-navigationdelegates-today">You can adopt <code>NavigationDelegate</code>s today</h2>
 <p>What I love about this idea is that it is cheap and portable.
 You don&#39;t have to change your application architecture to adopt it.
 In fact, it fits well with most architectures.</p>

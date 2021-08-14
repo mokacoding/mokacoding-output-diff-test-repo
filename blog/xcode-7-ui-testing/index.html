@@ -21,14 +21,13 @@
 <p><img src="https://s3.amazonaws.com/mokacoding/2015-06-16-xcode-7-record-test.gif" alt="Record UI test code animate GIF"></p>
 <p>The first acceptance criteria we outlined for Bench is &quot;<em>When I tap the &#39;say hello&#39; button, I see a gretings alert</em>&quot;.</p>
 <p>The code that gets generated for that interaction is:</p>
-<pre><code class=" hljs swift">testSayHello() {
-  <span class="hljs-keyword">let</span> app = <span class="hljs-type">XCUIApplication</span>()
+<pre><code class="hljs swift">testSayHello() {
+  <span class="hljs-keyword">let</span> app <span class="hljs-operator">=</span> <span class="hljs-type">XCUIApplication</span>()
   app.buttons[<span class="hljs-string">&quot;say hello&quot;</span>].tap()
   app.alerts[<span class="hljs-string">&quot;Hello&quot;</span>].collectionViews.buttons[<span class="hljs-string">&quot;Dismiss&quot;</span>].tap()
-}
-</code></pre>
+}</code></pre>
 <p>As you can see the syntax is pretty straightforward. If we now run the test we&#39;ll have an output like this in the Console:</p>
-<pre><code class=""><span class="hljs-attribute">Test</span> Case &#x27;-[BenchUITests.BenchUITests testSayHello]&#x27; started.
+<pre><code><span class="hljs-attribute">Test</span> Case &#x27;-[BenchUITests.BenchUITests testSayHello]&#x27; started.
 <span class="hljs-attribute">2015</span>-<span class="hljs-number">06</span>-<span class="hljs-number">15</span> <span class="hljs-number">19</span>:<span class="hljs-number">36</span>:<span class="hljs-number">13</span>.<span class="hljs-number">494</span> XCTRunner[<span class="hljs-number">3123</span>:<span class="hljs-number">9611325</span>] Continuing to run tests in the background with task ID <span class="hljs-number">1</span>
   <span class="hljs-attribute">t</span> =     <span class="hljs-number">1</span>.<span class="hljs-number">60</span>s     Wait for app to idle
   <span class="hljs-attribute">t</span> =     <span class="hljs-number">1</span>.<span class="hljs-number">81</span>s     Tap the <span class="hljs-string">&quot;say hello&quot;</span> Button
@@ -41,56 +40,49 @@
   <span class="hljs-attribute">t</span> =     <span class="hljs-number">2</span>.<span class="hljs-number">56</span>s         Find the <span class="hljs-string">&quot;Dismiss&quot;</span> Button
   <span class="hljs-attribute">t</span> =     <span class="hljs-number">2</span>.<span class="hljs-number">57</span>s         Dispatch the event
   <span class="hljs-attribute">t</span> =     <span class="hljs-number">2</span>.<span class="hljs-number">81</span>s         Wait for app to idle
-<span class="hljs-attribute">Test</span> Case &#x27;-[BenchUITests.BenchUITests testSayHello]&#x27; passed (<span class="hljs-number">3</span>.<span class="hljs-number">215</span> seconds).
-</code></pre><p>The output reports the action taken on the UI and their time delta since the start of the test case. This could become really useful while inspecting failures in apps in which time matters, like an egg counter for example.</p>
+<span class="hljs-attribute">Test</span> Case &#x27;-[BenchUITests.BenchUITests testSayHello]&#x27; passed (<span class="hljs-number">3</span>.<span class="hljs-number">215</span> seconds).</code></pre><p>The output reports the action taken on the UI and their time delta since the start of the test case. This could become really useful while inspecting failures in apps in which time matters, like an egg counter for example.</p>
 <p>You can access this from the test reporter as well, and if you click on the inspector icon you&#39;ll see a screenshot of the state of the app when the test failed.</p>
 <p><img src="https://s3.amazonaws.com/mokacoding/2015-06-16-xcode-7-test-report.png" alt="Test reporter screenshot"></p>
 <p>You might also have noticed that this test <em>isn&#39;t testing anything</em> apart from the fact that some elements are in the screen.</p>
 <h2 id="asserting-the-app-state">Asserting the app state</h2>
 <p>Bench&#39;s second acceptance criteria, in the form of a <a href="https://medium.com/the-job-to-be-done/replacing-the-user-story-with-the-job-story-af7cdee10c27">job story</a>, is &quot;<em>When I tap the &#39;show elements&#39; button, I see a list of elements</em>&quot;.</p>
 <p>The recorded code for this test is:</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testShowElements</span><span class="hljs-params">()</span></span> {
-  <span class="hljs-keyword">let</span> app = <span class="hljs-type">XCUIApplication</span>()
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testShowElements</span>()</span> {
+  <span class="hljs-keyword">let</span> app <span class="hljs-operator">=</span> <span class="hljs-type">XCUIApplication</span>()
   app.buttons[<span class="hljs-string">&quot;show elements&quot;</span>].tap()
   app.tables.staticTexts[<span class="hljs-string">&quot;[N] Nitrogen (7)&quot;</span>].swipeUp()
   app.tables.staticTexts[<span class="hljs-string">&quot;[Ir] Iridium (77)&quot;</span>].swipeUp()
   app.tables.staticTexts[<span class="hljs-string">&quot;[Tl] Thallium (81)&quot;</span>].swipeUp()
   app.tables.staticTexts[<span class="hljs-string">&quot;[Uut] Ununtrium (113)&quot;</span>].swipeUp()
-}
-</code></pre>
+}</code></pre>
 <p>This again is not very useful, and quite coupled with the formatting of the cell content.</p>
 <p>We can edit this test by simply making it verify that the screen presented when tapping &quot;show elements&quot; has one and only one table, and that the table has exactly 118 elements. Unless some major breakthrough in physics the number of elements in the period table will remain 118 for a while, which makes this test more deterministic than just relying on something as unstable as your designer or copywriter mood.</p>
 <p>Let&#39;s write the test again step by step. The start of the test will be the same, simply press the &quot;show elements&quot; button to load the next screen.</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">let</span> app = <span class="hljs-type">XCUIApplication</span>()
-</code></pre>
+<pre><code class="hljs swift"><span class="hljs-keyword">let</span> app <span class="hljs-operator">=</span> <span class="hljs-type">XCUIApplication</span>()</code></pre>
 <p><code>XCUIApplication</code> is a proxy to the running app, and is what we can use to query and interact with it.</p>
-<pre><code class=" hljs swift">app.buttons[<span class="hljs-string">&quot;show elements&quot;</span>].tap()
-</code></pre>
+<pre><code class="hljs swift">app.buttons[<span class="hljs-string">&quot;show elements&quot;</span>].tap()</code></pre>
 <p><code>.buttons[&quot;show elements&quot;]</code> is a <code>XCUIElementQuery</code> provided by the <code>XCUIApplication</code> instance. We can combine it with subscripting to look for a button named &quot;show elements&quot;, it will fail unless one and only one button matching that name is found. If a single button is found the query will return a <code>XCUIElement</code> proxy to that button. We can then tap the button through it&#39;s proxy with the <code>tap()</code> method.</p>
 <p><code>XCUIApplication</code>, <code>XCUIElementQuery</code>, and <code>XCUIElement</code> are the three APIs that make UI testing possible. You can find out more about them looking at their headers through Xcode.</p>
 <p>What we want to do next is making sure that the screen is showing one and only one table.</p>
-<pre><code class=" hljs swift"><span class="hljs-type">XCTAssertEqual</span>(app.tables.<span class="hljs-built_in">count</span>, <span class="hljs-number">1</span>)
-</code></pre>
+<pre><code class="hljs swift"><span class="hljs-type">XCTAssertEqual</span>(app.tables.count, <span class="hljs-number">1</span>)</code></pre>
 <p>We can combine the new UI testing APIs with the usual <code>XCTAssert...</code> ones. </p>
 <p>Having made sure that we have only one table, we can reliably move on and assert that the number of cells in the table matches the expected number of elements.</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">let</span> table = app.tables.elementAtIndex(<span class="hljs-number">0</span>)
-<span class="hljs-type">XCTAssertEqual</span>(table.cells.<span class="hljs-built_in">count</span>, <span class="hljs-number">118</span>)
-</code></pre>
+<pre><code class="hljs swift"><span class="hljs-keyword">let</span> table <span class="hljs-operator">=</span> app.tables.elementAtIndex(<span class="hljs-number">0</span>)
+<span class="hljs-type">XCTAssertEqual</span>(table.cells.count, <span class="hljs-number">118</span>)</code></pre>
 <p>And that&#39;s it for our first UI tests with Xcode 7.</p>
 <p>This test function all together look like:</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testShowElements</span><span class="hljs-params">()</span></span> {
-  <span class="hljs-keyword">let</span> app = <span class="hljs-type">XCUIApplication</span>()
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testShowElements</span>()</span> {
+  <span class="hljs-keyword">let</span> app <span class="hljs-operator">=</span> <span class="hljs-type">XCUIApplication</span>()
   app.buttons[<span class="hljs-string">&quot;show elements&quot;</span>].tap()
 
-  <span class="hljs-type">XCTAssertEqual</span>(app.tables.<span class="hljs-built_in">count</span>, <span class="hljs-number">1</span>)
+  <span class="hljs-type">XCTAssertEqual</span>(app.tables.count, <span class="hljs-number">1</span>)
 
-  <span class="hljs-keyword">let</span> table = app.tables.elementAtIndex(<span class="hljs-number">0</span>)
-  <span class="hljs-keyword">let</span> expectedNumberOfElements: <span class="hljs-type">UInt</span> = <span class="hljs-number">118</span>
-  <span class="hljs-type">XCTAssertEqual</span>(table.cells.<span class="hljs-built_in">count</span>, expectedNumberOfElements)
-}
-</code></pre>
+  <span class="hljs-keyword">let</span> table <span class="hljs-operator">=</span> app.tables.elementAtIndex(<span class="hljs-number">0</span>)
+  <span class="hljs-keyword">let</span> expectedNumberOfElements: <span class="hljs-type">UInt</span> <span class="hljs-operator">=</span> <span class="hljs-number">118</span>
+  <span class="hljs-type">XCTAssertEqual</span>(table.cells.count, expectedNumberOfElements)
+}</code></pre>
 <p>I&#39;m am personally very pleased by the framework so far, and I&#39;m looking forward to use it to test <em>real</em> apps. I think the message Apple is sending is very clear, they care about testing all across the spectrum, and so should we as developers!</p>
-<h2 id="what-s-next">What&#39;s next</h2>
+<h2 id="whats-next">What&#39;s next</h2>
 <p>First of all it would be nice to try out this new framework with more complex scenarios, the acceptance criteria that we set for Bench so far are very simple, and served us only to see how to <em>setup</em> a testing framework, not how to <em>harness its power</em>.</p>
 <p>Tests that we could find in real world application will have to include some form of decoupling form the network, taking animations into account, handling the app state between launches, and a deeper use of assertions.</p>
 <p>Other interesting things to explore would be how UI testing behaves when launched from the command line, and in CI environments.</p>

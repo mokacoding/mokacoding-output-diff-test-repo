@@ -7,7 +7,8 @@ talk so far, and I&#39;d like to share a summary of its contents and ideas here.
 software architecture and how manage its complexity.</p>
 <p>You can see the video from one of the talks
 <a href="https://youtu.be/nYxy7Y7Gji4?t=28m35s">here</a>. And these are the slides:</p>
-<p><iframe src="//www.slideshare.net/slideshow/embed_code/key/y1q0g6Yvw5IyAC" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/GiovanniLodi2/functional-core-reactive-shell" title="Functional Core, Reactive Shell" target="_blank">Functional Core, Reactive Shell</a> </strong> from <strong><a href="//www.slideshare.net/GiovanniLodi2" target="_blank">Giovanni Lodi</a></strong> </div></p>
+<iframe src="//www.slideshare.net/slideshow/embed_code/key/y1q0g6Yvw5IyAC" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/GiovanniLodi2/functional-core-reactive-shell" title="Functional Core, Reactive Shell" target="_blank">Functional Core, Reactive Shell</a> </strong> from <strong><a href="//www.slideshare.net/GiovanniLodi2" target="_blank">Giovanni Lodi</a></strong> </div>
+
 <h3 id="spaghetti-lasagna-and-pizza">Spaghetti, Lasagna and Pizza</h3>
 <p>We&#39;re all too familiar with so called spaghetti code, source code so entangled
 and messy to remind of a bowl of spaghetti, minus the deliciousness.</p>
@@ -74,8 +75,7 @@ results are what we actually care about.</p>
 <p>Isn&#39;t one of the points of tests to enable us to change the implementation of
 our components without changing the system&#39;s behaviour?</p>
 <p>If you were to test a method with this signature:</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">sum</span><span class="hljs-params">(a: Int, b: Int)</span></span> -&gt; <span class="hljs-type">Int</span>
-</code></pre>
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">sum</span>(<span class="hljs-params">a</span>: <span class="hljs-type">Int</span>, <span class="hljs-params">b</span>: <span class="hljs-type">Int</span>)</span> -&gt; <span class="hljs-type">Int</span></code></pre>
 <p>Would you assert that <code>+</code> is called, or that given 1 and 2 the result is 3?</p>
 <p>Smarter people than me have tackled the issue of mocking, one of those is <a href="https://twitter.com/kenscambler">Ken
 Scambler</a> in his post &quot;<a href="http://techblog.realestate.com.au/to-kill-a-mockingtest/">To Kill a
@@ -118,7 +118,7 @@ values as well!</p>
 from the code taking action, what actually performs the effect.</p>
 <p>For example when storing some data in the database we could have a
 <code>DatabaseAction</code> value:</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">enum</span> <span class="hljs-title">DatabaseActionMode</span> </span>{
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">enum</span> <span class="hljs-title">DatabaseActionMode</span> </span>{
   <span class="hljs-keyword">case</span> <span class="hljs-type">Delete</span>
   <span class="hljs-keyword">case</span> <span class="hljs-type">Insert</span>
   <span class="hljs-keyword">case</span> <span class="hljs-type">Update</span>
@@ -127,22 +127,20 @@ from the code taking action, what actually performs the effect.</p>
 <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">DatabaseAction</span> </span>{
   <span class="hljs-keyword">let</span> objects: [<span class="hljs-type">Persistable</span>]
   <span class="hljs-keyword">let</span> mode: <span class="hljs-type">DatabaseActionMode</span>
-}
-</code></pre>
+}</code></pre>
 <p>Testing code that interacts with the database would then become a matter of
 testing the logic, pure functions, producing <code>DatabaseAction</code> values.</p>
 <p>The action can then be performed by something like this:</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DatabaseService</span> </span>{
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DatabaseService</span> </span>{
 
-  <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">performAction</span><span class="hljs-params">(action: DatabaseAction)</span></span> {
+  <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">performAction</span>(<span class="hljs-params">action</span>: <span class="hljs-type">DatabaseAction</span>)</span> {
     <span class="hljs-keyword">switch</span> action.mode {
     <span class="hljs-keyword">case</span> .<span class="hljs-type">Delete</span>: <span class="hljs-comment">// ...</span>
     <span class="hljs-keyword">case</span> .<span class="hljs-type">Insert</span>: <span class="hljs-comment">// ...</span>
     <span class="hljs-keyword">case</span> .<span class="hljs-type">Update</span>: <span class="hljs-comment">// ...</span>
     }
   }
-}
-</code></pre>
+}</code></pre>
 <p>Testing <code>DatabaseService</code> would be easy as well, just create a simple
 <code>DatabaseAction</code> and verify that the <code>objects</code> it carries are modified in
 database according to the value of its <code>mode</code> property.</p>
@@ -183,7 +181,7 @@ it down to a number of functions that we can test with confidence.</p>
 quite easily too, just provide our own source of input signals to the shell,
 and subscribe to them to assert the side effect values are configured as
 expected.</p>
-<h3 id="is-this-pizza-actually-edible-">Is this pizza actually edible?</h3>
+<h3 id="is-this-pizza-actually-edible">Is this pizza actually edible?</h3>
 <p>While there&#39;s little doubt that real Italian food, and Pizza in particular, is
 delicious, you might be wondering if the &quot;Functional Core, Reactive Shell&quot; is
 actually a good idea.</p>
@@ -196,12 +194,12 @@ want to change architecture, or if the original team is replaced by one less
 familiar with FRP.</p>
 <p>Finally, another considerable disadvantage is that the reactive shell code, the
 crust of the pizza, will look long and odd. Like this:</p>
-<pre><code class=" hljs swift"><span class="hljs-type">SignalProducer</span>(values: [
+<pre><code class="hljs swift"><span class="hljs-type">SignalProducer</span>(values: [
     <span class="hljs-comment">//</span>
     <span class="hljs-comment">// Input sources</span>
     <span class="hljs-comment">//</span>
     databaseService.allStuff()
-        .<span class="hljs-built_in">map</span> { $<span class="hljs-number">0</span>.<span class="hljs-built_in">map</span> { <span class="hljs-type">Stuff</span>(realmObject: $<span class="hljs-number">0</span>) } },
+        .map { <span class="hljs-variable">$0</span>.map { <span class="hljs-type">Stuff</span>(realmObject: <span class="hljs-variable">$0</span>) } },
 
     networkService.performRequest(toEndpoint: .<span class="hljs-type">GetStuff</span>)
         .flatMap(.<span class="hljs-type">Latest</span>) { <span class="hljs-type">JSON</span> <span class="hljs-keyword">in</span>
@@ -212,22 +210,21 @@ crust of the pizza, will look long and odd. Like this:</p>
     <span class="hljs-comment">//</span>
     <span class="hljs-comment">// Data transformations</span>
     <span class="hljs-comment">//</span>
-    .<span class="hljs-built_in">map</span> { stuffArray <span class="hljs-keyword">in</span> stuffArray.<span class="hljs-built_in">map</span> { <span class="hljs-type">CellViewModel</span>(stuff: $<span class="hljs-number">0</span>) } }
-    .<span class="hljs-built_in">map</span> { viewModels <span class="hljs-keyword">in</span> <span class="hljs-type">Effect</span>.<span class="hljs-type">UpdateView</span>(viewModels: viewModels) }
+    .map { stuffArray <span class="hljs-keyword">in</span> stuffArray.map { <span class="hljs-type">CellViewModel</span>(stuff: <span class="hljs-variable">$0</span>) } }
+    .map { viewModels <span class="hljs-keyword">in</span> <span class="hljs-type">Effect</span>.<span class="hljs-type">UpdateView</span>(viewModels: viewModels) }
     <span class="hljs-comment">//</span>
     <span class="hljs-comment">// Collect and perform side effects</span>
     <span class="hljs-comment">//</span>
     .observeOn(<span class="hljs-type">UIScheduler</span>())
     .on(
         failed: { [<span class="hljs-keyword">weak</span> <span class="hljs-keyword">self</span>] error <span class="hljs-keyword">in</span>
-            <span class="hljs-keyword">self</span>?.performEffect(<span class="hljs-type">Effect</span>.<span class="hljs-type">PresentAlert</span>(error: error))
+            <span class="hljs-keyword">self</span><span class="hljs-operator">?</span>.performEffect(<span class="hljs-type">Effect</span>.<span class="hljs-type">PresentAlert</span>(error: error))
         },
         next: { [<span class="hljs-keyword">weak</span> <span class="hljs-keyword">self</span>] effect <span class="hljs-keyword">in</span>
-            <span class="hljs-keyword">self</span>?.performEffect(effect)
+            <span class="hljs-keyword">self</span><span class="hljs-operator">?</span>.performEffect(effect)
         }
     )
-    .start()
-</code></pre>
+    .start()</code></pre>
 <p>You can see more code
 <a href="https://github.com/mokacoding/functional-core-reactive-shell-demo">here</a>.</p>
 <p>My personal opinion is that these issues are balanced up by what you get out of

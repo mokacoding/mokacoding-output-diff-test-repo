@@ -20,7 +20,7 @@
 <p>To do so we need to stub the method used to generate such temporary file, <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/tempfile/rdoc/Tempfile.html#method-i-open"><code>Tempfile#open</code></a>.</p>
 <p>RSpec provides a way to stub a method call response by <a href="https://www.relishapp.com/rspec/rspec-mocks/v/3-2/docs/configuring-responses/block-implementation#yield-to-the-caller&#39;s-block">yelding to the caller&#39;s block</a>:</p>
 <p>That&#39;s all I needed 😄.</p>
-<pre><code class=" hljs ruby">fake_temp_file = Tempfile.new(<span class="hljs-string">&#x27;fake.yml&#x27;</span>)
+<pre><code class="hljs ruby">fake_temp_file = Tempfile.new(<span class="hljs-string">&#x27;fake.yml&#x27;</span>)
 
 <span class="hljs-comment"># Using begin-ensure-end here to avoid confusingly calling Tempfile.open and</span>
 <span class="hljs-comment"># stubbing it at the same time.</span>
@@ -30,25 +30,22 @@
 <span class="hljs-keyword">ensure</span>
   fake_temp_file.close
   fake_temp_file.unlink
-<span class="hljs-keyword">end</span>
-</code></pre>
+<span class="hljs-keyword">end</span></code></pre>
 <h2 id="how-to-remove-keys-from-a-ruby-hash">How to remove keys from a Ruby hash</h2>
 <p>Part of what the PR needed to do was to generate a new configuration YAML file that wouldn&#39;t include the node that the CLI option cannot override.</p>
 <p>To do so the original configuration file is read and put into an hash. The hash is then mutated removing the key corresponding to the setting that needs to be overridden via CLI. Finally the hash is converted back into YAML and wrote into the temporary file.</p>
 <p>I naively thought that setting its value to nil would have been enough to remove a key from an hash. I should have though about it for longer that one second.</p>
 <p>Setting a key&#39;s value to nil… sets it&#39;s value to nil 😅 The key is still there.</p>
 <p>This is usually ok in code because we usually do things like <code>unless hash[:key].nil? do ...</code>. In the case of serialization to YAML that&#39;s no good though, as what we&#39;d get is a YAML with an empty node corresponding to the key with nil value.</p>
-<pre><code class=" hljs ruby"><span class="hljs-keyword">require</span> <span class="hljs-string">&#x27;yaml&#x27;</span>
+<pre><code class="hljs ruby"><span class="hljs-keyword">require</span> <span class="hljs-string">&#x27;yaml&#x27;</span>
 
 hash = { <span class="hljs-symbol">foo:</span> <span class="hljs-literal">nil</span> }
 
 hash.to_yaml
-<span class="hljs-comment"># =&gt; &quot;---\n:foo: \n&quot;</span>
-</code></pre>
+<span class="hljs-comment"># =&gt; &quot;---\n:foo: \n&quot;</span></code></pre>
 <p>The correct way to remove a key from an hash is to use <code>tap</code>.</p>
-<pre><code class=" hljs ruby">{ <span class="hljs-symbol">foo:</span> <span class="hljs-literal">nil</span>, <span class="hljs-symbol">bar:</span> <span class="hljs-string">&#x27;baz&#x27;</span> }.tap { <span class="hljs-params">|hash|</span> hash.delete(<span class="hljs-symbol">:foo</span>) }
-<span class="hljs-comment"># =&gt; { :bar =&gt;&quot;baz&quot; }</span>
-</code></pre>
+<pre><code class="hljs ruby">{ <span class="hljs-symbol">foo:</span> <span class="hljs-literal">nil</span>, <span class="hljs-symbol">bar:</span> <span class="hljs-string">&#x27;baz&#x27;</span> }.tap { <span class="hljs-params">|hash|</span> hash.delete(<span class="hljs-symbol">:foo</span>) }
+<span class="hljs-comment"># =&gt; { :bar =&gt;&quot;baz&quot; }</span></code></pre>
 <hr>
 <p>I love open source and being able to support the projects I use by contributing to them. Submitting pull requests is always a great occasion to learn new things and to grow as a developer. I encourage you to do the same!</p>
 <p>If you know of a better way of achieving the same results as I did, or if you have any other  please leave a comment below or get in touch on Twitter <a href="https://twitter.com/mokagio">@mokagio</a>.</p>

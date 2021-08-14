@@ -8,61 +8,57 @@
 Swift now supports the async/await pattern, first introduced <a href="https://en.wikipedia.org/wiki/Async/await#History">in F# in the late 2000s</a> and then adopted in other languages including <a href="https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Async_await">JavaScript</a>, <a href="https://www.typescriptlang.org/play#example/async-await">TypeScript</a>, and <a href="https://rust-lang.github.io/async-book/01_getting_started/04_async_await_primer.html">Rust</a>.</p>
 <p>This is a huge improvement for developers and it will help describe the code in a way that is easier to reason about and safer to update.</p>
 <p>Let&#39;s look at how to write unit tests for code using <code>async await</code> in Xcode 13 with <a href="https://mokacoding.com/tag/xctest/">XCTest</a>.</p>
-<h2 id="how-to-unit-test-async-await-code">How to unit test async/await code</h2>
+<h2 id="how-to-unit-test-asyncawait-code">How to unit test async/await code</h2>
 <p>I&#39;m a sucker for culinary examples, my book <a href="https://tddinswift.com"><em>Test-Driven Development in Swift</em></a> uses a restaurant menu ordering app to teach TDD, and I was delighted to see Apple introduce async/await in the <a href="https://developer.apple.com/documentation/xcode-release-notes/xcode-13-beta-release-notes">Xcode 13.0 beta 1 release notes</a> using asynchronous functions to prepare dinner.
 Let&#39;s stick with Apple&#39;s examples and write a test for the asynchronous <code>chopVegetables</code> method to ensure the vegetables are properly chopped by checking that the returning array has more than one element.</p>
 <p>Because async/await is a feature at the Swift language level, to test an <code>async</code> function we can use the same approach we&#39;d use to consume that code in production: call it with <code>await</code>.</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">chopVegetables</span><span class="hljs-params">()</span></span> async <span class="hljs-keyword">throws</span> -&gt; [<span class="hljs-type">Vegetable</span>]
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">chopVegetables</span>()</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">throws</span> -&gt; [<span class="hljs-type">Vegetable</span>]
 
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testChoppingVegetablesReturnsManyVegetables</span><span class="hljs-params">()</span></span> async <span class="hljs-keyword">throws</span> {
-    <span class="hljs-keyword">let</span> vegetables = <span class="hljs-keyword">try</span> await chopVegetables()
-    <span class="hljs-type">XCTAssertGreaterThan</span>(vegetables.<span class="hljs-built_in">count</span>, <span class="hljs-number">1</span>)
-}
-</code></pre>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testChoppingVegetablesReturnsManyVegetables</span>()</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">throws</span> {
+    <span class="hljs-keyword">let</span> vegetables <span class="hljs-operator">=</span> <span class="hljs-keyword">try</span> <span class="hljs-keyword">await</span> chopVegetables()
+    <span class="hljs-type">XCTAssertGreaterThan</span>(vegetables.count, <span class="hljs-number">1</span>)
+}</code></pre>
 <p>That&#39;s it.</p>
 <p>To appreciate how neater this is than the approach we used before the introduction of <code>async await</code>, let me show you the same test but for a <code>chopVegetables</code> version using callbacks and <code>Result</code>.</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">chopVegetables</span><span class="hljs-params">(completion: @escaping <span class="hljs-params">(Result&lt;[Vegetable], CookingError&gt;)</span></span></span> -&gt; <span class="hljs-type">Void</span>) { ... }
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">chopVegetables</span>(<span class="hljs-params">completion</span>: <span class="hljs-keyword">@escaping</span> (<span class="hljs-type">Result</span>&lt;[<span class="hljs-type">Vegetable</span>], <span class="hljs-type">CookingError</span>&gt;) -&gt; <span class="hljs-type">Void</span>)</span> { <span class="hljs-operator">...</span> }
 
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testChoppingVegetablesReturnsManyVegetables</span><span class="hljs-params">()</span></span> {
-    <span class="hljs-keyword">let</span> expectation = <span class="hljs-type">XCTestExpectation</span>(description: <span class="hljs-string">&quot;Chops the vegetables&quot;</span>)
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testChoppingVegetablesReturnsManyVegetables</span>()</span> {
+    <span class="hljs-keyword">let</span> expectation <span class="hljs-operator">=</span> <span class="hljs-type">XCTestExpectation</span>(description: <span class="hljs-string">&quot;Chops the vegetables&quot;</span>)
 
     chopVegetables { result <span class="hljs-keyword">in</span>
-        <span class="hljs-keyword">guard</span> <span class="hljs-keyword">case</span> .success(<span class="hljs-keyword">let</span> vegetables) = result <span class="hljs-keyword">else</span> { <span class="hljs-keyword">return</span> }
-        <span class="hljs-type">XCTAssertGreaterThan</span>(vegetables.<span class="hljs-built_in">count</span>, <span class="hljs-number">1</span>)
+        <span class="hljs-keyword">guard</span> <span class="hljs-keyword">case</span> .success(<span class="hljs-keyword">let</span> vegetables) <span class="hljs-operator">=</span> result <span class="hljs-keyword">else</span> { <span class="hljs-keyword">return</span> }
+        <span class="hljs-type">XCTAssertGreaterThan</span>(vegetables.count, <span class="hljs-number">1</span>)
         expectation.fulfill()
     }
 
-    wait(<span class="hljs-keyword">for</span>: [expectation], timeout: <span class="hljs-number">1</span>)
-}
-</code></pre>
+    wait(for: [expectation], timeout: <span class="hljs-number">1</span>)
+}</code></pre>
 <p>The contrast is striking.
 asycn/await is certainly a welcome change on the testing side of the codebase, too!</p>
-<h2 id="how-do-async-await-tests-fail-">How do async/await tests fail?</h2>
+<h2 id="how-do-asyncawait-tests-fail">How do async/await tests fail?</h2>
 <p>If the code we&#39;re <code>await</code>ing throws, the test will fail like any other test that throws.</p>
 <p><img src="https://s3.amazonaws.com/mokacoding/2021-06-07-async-await-failure.jpg" alt="screenshot of test failure"></p>
 <p>If you want to have more refined error handling, you can wrap the <code>try await</code> call in a <code>do catch</code>.</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testChoppingVegetablesReturnsManyVegetables</span><span class="hljs-params">()</span></span> async {
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testChoppingVegetablesReturnsManyVegetables</span>()</span> <span class="hljs-keyword">async</span> {
     <span class="hljs-keyword">do</span> {
-        <span class="hljs-keyword">let</span> vegetables = <span class="hljs-keyword">try</span> await chopVegetables(using: <span class="hljs-type">Knife</span>(sharpness: .low))
-        <span class="hljs-type">XCTAssertGreaterThan</span>(vegetables.<span class="hljs-built_in">count</span>, <span class="hljs-number">1</span>)
+        <span class="hljs-keyword">let</span> vegetables <span class="hljs-operator">=</span> <span class="hljs-keyword">try</span> <span class="hljs-keyword">await</span> chopVegetables(using: <span class="hljs-type">Knife</span>(sharpness: .low))
+        <span class="hljs-type">XCTAssertGreaterThan</span>(vegetables.count, <span class="hljs-number">1</span>)
     } <span class="hljs-keyword">catch</span> {
-        <span class="hljs-type">XCTFail</span>(<span class="hljs-string">&quot;Expected chopped vegetables, but failed \(error).&quot;</span>)
+        <span class="hljs-type">XCTFail</span>(<span class="hljs-string">&quot;Expected chopped vegetables, but failed <span class="hljs-subst">\(error)</span>.&quot;</span>)
     }
-}
-</code></pre>
+}</code></pre>
 <p>Using <code>do catch</code>, you can generate more informative failures messages, which will help you triage and fix failed tests in the future.</p>
-<h2 id="how-to-test-the-failure-path-in-async-await-code">How to test the failure path in async/await code</h2>
+<h2 id="how-to-test-the-failure-path-in-asyncawait-code">How to test the failure path in async/await code</h2>
 <p>You can use the <code>do catch</code> approach to verify how async/await code fails.</p>
 <p>Let&#39;s extend the Apple examples by adding a <code>Knife</code> parameter to the chopping function and expecting an error to be thrown if the knife is blunt.</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testChoppingVegetablesThrowsWhenKnifeBlunt</span><span class="hljs-params">()</span></span> {
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testChoppingVegetablesThrowsWhenKnifeBlunt</span>()</span> {
     <span class="hljs-keyword">do</span> {
-        <span class="hljs-number">_</span> = <span class="hljs-keyword">try</span> await chopVegetables(using: <span class="hljs-type">Knife</span>(sharpness: .low))
+        <span class="hljs-keyword">_</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">try</span> <span class="hljs-keyword">await</span> chopVegetables(using: <span class="hljs-type">Knife</span>(sharpness: .low))
         <span class="hljs-type">XCTFail</span>(<span class="hljs-string">&quot;Expected to throw while awaiting, but succeeded&quot;</span>)
     } <span class="hljs-keyword">catch</span> {
-        <span class="hljs-type">XCTAssertEqual</span>(error <span class="hljs-keyword">as</span>? <span class="hljs-type">CookingError</span>, .knifeTooBlunt)
+        <span class="hljs-type">XCTAssertEqual</span>(error <span class="hljs-keyword">as?</span> <span class="hljs-type">CookingError</span>, .knifeTooBlunt)
     }
-}
-</code></pre>
+}</code></pre>
 <p>Unfortunately the <code>XCTAssertThorwsError</code> and the other assertion APIs don&#39;t support concurrency yet, so <code>do catch</code> is the only option to test the error path of <code>async</code> code.</p>
 <p><img src="https://s3.amazonaws.com/mokacoding/2021-06-07-xctassertthrowserror.jpg" alt="screenshot of unsupported concurrency error"></p>
 <hr>

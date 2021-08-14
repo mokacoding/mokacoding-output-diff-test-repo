@@ -3,41 +3,42 @@
 </p></div></div></div></div><div class="page"><div class="row-12"><div class="col-12 header"><h1 class="brand"><a href="/">mokacoding</a></h1><div class="punchline">unit and acceptance testing, automation, productivity</div><div class="links"><a href="/archive.html">Archive</a><a href="/tags.html">Tags</a><a href="https://gio.codes">About</a><a href="#subscribe">Subscribe</a><a href="/feed.xml"><i class="fa fa-rss"></i></a></div></div><div class="col-12"><div class="post-container"><h2 class="post-title"><a href="/blog/upgrading-podfile">A caveat when upgrading a Podfile</a></h2><p class="post-meta"><span class="post-date">Fri Mar 28 2014&nbsp;</span><a href="/tag/CocoaPods/index.html" class="post-tag">-CocoaPods</a></p><div class="post"><p>I recently went through the process of upgrading a <code>Podfile</code> from a legacy codebase and bumped into an issue with a very simple solution, for those who understand how <a href="http://cocoapods.org">CocoaPods</a> works under the hood.</p>
 <p>I made an example project to show the behaviour, check it out <a href="https://github.com/mokagio/mokacoding-samples/tree/podfile-upgrade">here</a>.</p>
 <p>The <code>Podfile</code> looked like this:</p>
-<pre><code class=" hljs ruby">link_with [<span class="hljs-string">&#x27;MyProject&#x27;</span>, <span class="hljs-string">&#x27;MyProjectTests&#x27;</span>]
+<pre><code class="hljs ruby">link_with [<span class="hljs-string">&#x27;MyProject&#x27;</span>, <span class="hljs-string">&#x27;MyProjectTests&#x27;</span>]
 
 pod <span class="hljs-string">&#x27;AFNetworking&#x27;</span>
-pod <span class="hljs-string">&#x27;Kiwi&#x27;</span>
-</code></pre>
+pod <span class="hljs-string">&#x27;Kiwi&#x27;</span></code></pre>
 <p>(<em>it was actually longer an messier, with random newlines a lot of pods commented out, but no need to inflict you with that</em>)</p>
 <p>Apart from the obsolete <code>Podfile</code> style, there&#39;s one big issue; <a href="https://github.com/allending/Kiwi">Kiwi</a> should be linked only in the test target, as it is a testing framework.</p>
 <p>Updating the <code>Podfile</code> into a more semantic and not leaky one was simple:</p>
-<pre><code class=" hljs ruby">target <span class="hljs-symbol">:MyProject</span> <span class="hljs-keyword">do</span>
+<pre><code class="hljs ruby">target <span class="hljs-symbol">:MyProject</span> <span class="hljs-keyword">do</span>
   pod <span class="hljs-string">&#x27;AFNetworking&#x27;</span>
 <span class="hljs-keyword">end</span>
 
 target <span class="hljs-symbol">:MyProjectTests</span>, <span class="hljs-symbol">:exclusive</span> =&gt; <span class="hljs-literal">true</span> <span class="hljs-keyword">do</span>
   pod <span class="hljs-string">&#x27;Kiwi&#x27;</span>
-<span class="hljs-keyword">end</span>
-</code></pre>
+<span class="hljs-keyword">end</span></code></pre>
 <p>So far so good, but at that point after running <code>pod install</code> the project didn&#39;t build anymore! The error was:</p>
-<pre><code class="">ld: library not found <span class="hljs-keyword">for</span> -lPods
-clang: error: linker command failed with <span class="hljs-keyword">exit</span> code <span class="hljs-number">1</span> (use -v to see invocation)
-</code></pre><p>This happens to be a pretty common error, specially for newbies, and in the <a href="http://guides.cocoapods.org/using/troubleshooting.html#using-the-cocoapods-project">CocoaPods Troubleshooting page</a> there&#39;s a solution for it...</p>
+<pre><code>ld: library not found <span class="hljs-keyword">for</span> -lPods
+clang: error: linker command failed with <span class="hljs-keyword">exit</span> code <span class="hljs-number">1</span> (use -v to see invocation)</code></pre><p>This happens to be a pretty common error, specially for newbies, and in the <a href="http://guides.cocoapods.org/using/troubleshooting.html#using-the-cocoapods-project">CocoaPods Troubleshooting page</a> there&#39;s a solution for it...</p>
 <p>...that in our case doesn&#39;t work!</p>
 <p>After a non irrelevant amount of time spent deleting Derived Data and googling I went back to the error and asked myself: <em>what does <code>library not found for -lPods</code> mean?</em> It means that something that should be there is not there anymore! <em>And what&#39;s missing?__ <code>library not found</code>. _And where are the libraries?</em> In the &quot;Link Binary With Libraries&quot; section of the target build phase. Daaah.</p>
 <p>So I took a look at the &quot;Link Binary With Libraries&quot;, this is what I found:</p>
-<p><img src="http://mokacoding.s3.amazonaws.com/2014-03-28-linked-libraries2.png" alt="Link Binary With Libraries for the updated project"/></p>
+<img src="http://mokacoding.s3.amazonaws.com/2014-03-28-linked-libraries2.png" alt="Link Binary With Libraries for the updated project"/>
+
 <p>If we&#39;d rolled back to the previous version we&#39;d seen this:</p>
-<p><img src="http://mokacoding.s3.amazonaws.com/2014-03-28-linked-libraries.png" alt="Link Binary With Libraries for the obsolete project"/></p>
+<img src="http://mokacoding.s3.amazonaws.com/2014-03-28-linked-libraries.png" alt="Link Binary With Libraries for the obsolete project"/>
+
 <p>Mmm... what is that new <code>libPods-MyProject</code> static library?</p>
 <p>And then I looked at the Pods project:</p>
-<p><img src="http://mokacoding.s3.amazonaws.com/2014-03-28-pods-targets.png" style="width: 300px" alt="Linked Frameworks and Libraries for the updated project"/></p>
+<img src="http://mokacoding.s3.amazonaws.com/2014-03-28-pods-targets.png" style="width: 300px" alt="Linked Frameworks and Libraries for the updated project"/>
+
 <p>Can you spot it? There is no Pods target! </p>
 <p>And here the solution to the problem: the linker cannot find <code>libPods</code> because there is no <code>libPods</code> at all, not anymore. It is just a memory of the previous configuration that CocoaPods didn&#39;t remove.</p>
 <p>I removed <code>libPods.a</code> from the &quot;Linked Frameworks and Libraries&quot; and everything was running smoothly again.</p>
 <p>An extra thing: the same operation needs to be done for the tests target, beacuse of the <code>link_with [&#39;MyProject&#39;, &#39;MyProjectTests&#39;]</code>.</p>
 <p>Another extra thing: this <em>memory</em> of <code>libPods</code>&quot; error happens when you <strong>change the name of the target</strong> as well.</p>
-<p><img src="http://mokacoding.s3.amazonaws.com/2014-03-28-linked-libraries3.png" alt="Link Binary With Libraries after changing the target name"/></p>
+<img src="http://mokacoding.s3.amazonaws.com/2014-03-28-linked-libraries3.png" alt="Link Binary With Libraries after changing the target name"/>
+
 <hr>
 <p>As we develop advanced badass systems we rely on many tools and frameworks, to delegate work to someone that knows how to do it better. Knowing how those we rely most heavily upon work on a level that is deeper than what&#39;s written in the README is invaluable to save time debugging and to get the most out of them.</p>
 <p>I challenge you to spend some time reading the source code of one of the tools you use the most. Have fun!</p>

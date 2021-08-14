@@ -5,7 +5,7 @@ Dangerous&quot;</a>.
 <a href="http://dimsumthinking.com/">Daniel H Steinberg </a>, on Twitter as
 <a href="https://twitter.com/dimsumthinking">@dimsumthinking</a>,
 pointed out to me that the terminology used in the poost wasn&#39;t accurate:</p>
-<p><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr"><a href="https://twitter.com/mokagio">@mokagio</a> Actually your article is about explicitly unwrapped optionals not implicitly unwrapped. Very different.</p>&mdash; dimsumthinking (@dimsumthinking) <a href="https://twitter.com/dimsumthinking/status/758290839504359424">July 27, 2016</a></blockquote></p>
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr"><a href="https://twitter.com/mokagio">@mokagio</a> Actually your article is about explicitly unwrapped optionals not implicitly unwrapped. Very different.</p>&mdash; dimsumthinking (@dimsumthinking) <a href="https://twitter.com/dimsumthinking/status/758290839504359424">July 27, 2016</a></blockquote>
 <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 <p>He was right. I went back on the <a href="https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/Types.html#//apple_ref/swift/grammar/optional-type">Swift
@@ -18,17 +18,15 @@ means something slighltly different.</p>
 <h2 id="implicitly-unwrapping">Implicitly Unwrapping</h2>
 <p>You define an <code>Optional</code> as impliticly unwrapped when you define its type like
 this:</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">let</span> x: <span class="hljs-type">String!</span>
-</code></pre>
+<pre><code class="hljs swift"><span class="hljs-keyword">let</span> x: <span class="hljs-type">String</span>!</code></pre>
 <p>This technique allows you to tell the compiler to automatically unwrap that
 value, as if it wasn&#39;t optional at all.</p>
 <p>Simlarly to <code>Type?</code> which is a syntactic sugar for <code>Optional&lt;Type&gt;</code>, <code>Type!</code> is
 equivalent to <code>ImplicitlyUnwrappedOptional&lt;Type&gt;</code>.</p>
 <p>A common example of implicitly unwrapped optionals is how view controller
 define their <code>IBOutlet</code>s:</p>
-<pre><code class=" hljs swift"><span class="hljs-meta">@IBOutlet</span> <span class="hljs-keyword">var</span> messageLabel: <span class="hljs-type">UILabel!</span>
-<span class="hljs-meta">@IBOutlet</span> <span class="hljs-keyword">var</span> actionButton: <span class="hljs-type">UIButton!</span>
-</code></pre>
+<pre><code class="hljs swift"><span class="hljs-keyword">@IBOutlet</span> <span class="hljs-keyword">var</span> messageLabel: <span class="hljs-type">UILabel</span>!
+<span class="hljs-keyword">@IBOutlet</span> <span class="hljs-keyword">var</span> actionButton: <span class="hljs-type">UIButton</span>!</code></pre>
 <p>It makes sense to define the outlets as implicitly unwrapped optionals because
 their are going to be instantiated by Interface Builder. It would be cumbersome
 to always unwrap each view outlet inside view controllers.</p>
@@ -40,16 +38,15 @@ when you try to access it in the view controller.</p>
 of <a href="">the previous post</a> was actually about. It consist in adding a <code>!</code> after
 an <code>Optional</code> value, to automatically unwrap it, without having to check
 whether it is <code>nil</code> or not.</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">let</span> strings = [<span class="hljs-string">&quot;mokacoding&quot;</span>, <span class="hljs-string">&quot;is&quot;</span>, <span class="hljs-string">&quot;a&quot;</span>, <span class="hljs-string">&quot;blog&quot;</span>]
-<span class="hljs-keyword">let</span> firstLength: <span class="hljs-type">Int</span> = strings.first!.length
-</code></pre>
+<pre><code class="hljs swift"><span class="hljs-keyword">let</span> strings <span class="hljs-operator">=</span> [<span class="hljs-string">&quot;mokacoding&quot;</span>, <span class="hljs-string">&quot;is&quot;</span>, <span class="hljs-string">&quot;a&quot;</span>, <span class="hljs-string">&quot;blog&quot;</span>]
+<span class="hljs-keyword">let</span> firstLength: <span class="hljs-type">Int</span> <span class="hljs-operator">=</span> strings.first<span class="hljs-operator">!</span>.length</code></pre>
 <p>Like implicitly unwrapping, force unwrap uses a <code>!</code> and makes the compiler
 treat an otherwise optional value as the type it wraps. Unlike implicitly
 unwrapping though, this technique is used on existing values.</p>
 <p>You define a type as implicitly unwrapped, <code>ImplicitlyUnwrappedOptional&lt;T&gt;</code>,
 and you force unwrap a value which has <code>Optional</code> type.</p>
 <h2 id="they-are-both-dangerous">They are both dangerous</h2>
-<p><blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="en" dir="ltr"><a href="https://twitter.com/dimsumthinking">@dimsumthinking</a> While semantically different, the end result of using either of the two tools is the same though: less runtime confidence</p>&mdash; You can call me Joe (@mokagio) <a href="https://twitter.com/mokagio/status/758470579276029952">July 28, 2016</a></blockquote></p>
+<blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="en" dir="ltr"><a href="https://twitter.com/dimsumthinking">@dimsumthinking</a> While semantically different, the end result of using either of the two tools is the same though: less runtime confidence</p>&mdash; You can call me Joe (@mokagio) <a href="https://twitter.com/mokagio/status/758470579276029952">July 28, 2016</a></blockquote>
 <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 <p>As said in the <code>IBOutlet</code> example and in <a href="https://mokacoding.com/blog/why-implicitly-unwrapping-swift-optionals-is-dangerous/">the previous

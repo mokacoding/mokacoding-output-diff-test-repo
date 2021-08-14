@@ -5,39 +5,35 @@ Today, I discovered a way to retain the compiler-generated init and have it set 
 <p>One of the many cool Swift compiler features that save development time is the compiler-generate initializer for <code>struct</code>s.
 Unless you explicitly define an <code>init</code> method, the compiler will generate one for you based on the properties of your <code>struct</code>.</p>
 <p>Consider this <code>Pizza</code> <code>struct</code>:</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Pizza</span> </span>{
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Pizza</span> </span>{
 
   <span class="hljs-keyword">let</span> name: <span class="hljs-type">String</span>
   <span class="hljs-keyword">let</span> ingredients: [<span class="hljs-type">Ingredient</span>]
-}
-</code></pre>
+}</code></pre>
 <p>The compiler will generate an <code>init</code> method for it with the parameters in the same order as the properties definition.</p>
-<pre><code class=""><span class="hljs-keyword">let</span> pizza = <span class="hljs-constructor">Pizza(<span class="hljs-params">name</span>: <span class="hljs-string">&quot;Margherita&quot;</span>, <span class="hljs-params">ingredients</span>: [.<span class="hljs-params">tomatoSauce</span>, .<span class="hljs-params">mozzarella</span>])</span>
-</code></pre><p>Now, imagine we want to add extras to our <code>Pizza</code>.
+<pre><code><span class="hljs-keyword">let</span> pizza = <span class="hljs-constructor">Pizza(<span class="hljs-params">name</span>: <span class="hljs-string">&quot;Margherita&quot;</span>, <span class="hljs-params">ingredients</span>: [.<span class="hljs-params">tomatoSauce</span>, .<span class="hljs-params">mozzarella</span>])</span></code></pre><p>Now, imagine we want to add extras to our <code>Pizza</code>.
 By default, a pizza should not have extras, but consumers can decide to add some – I like my Margherita extra cheesy, so I always ask for double mozzarella.</p>
 <p>One way to do that is to define an <code>init</code> with the default value:</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Pizza</span> </span>{
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Pizza</span> </span>{
 
   <span class="hljs-keyword">let</span> name: <span class="hljs-type">String</span>
   <span class="hljs-keyword">let</span> ingredients: [<span class="hljs-type">Ingredient</span>]
   <span class="hljs-keyword">let</span> extra: [<span class="hljs-type">Ingredient</span>]
 
-  <span class="hljs-keyword">init</span>(name: <span class="hljs-type">String</span>, ingredients: [<span class="hljs-type">Ingredient</span>], extras: [<span class="hljs-type">Ingredient</span>] = []) {
-    <span class="hljs-keyword">self</span>.name = name
-    <span class="hljs-keyword">self</span>.ingredients = ingredients
-    <span class="hljs-keyword">self</span>.extras = extras
+  <span class="hljs-function"><span class="hljs-keyword">init</span>(<span class="hljs-params">name</span>: <span class="hljs-type">String</span>, <span class="hljs-params">ingredients</span>: [<span class="hljs-type">Ingredient</span>], <span class="hljs-params">extras</span>: [<span class="hljs-type">Ingredient</span>] <span class="hljs-operator">=</span> [])</span> {
+    <span class="hljs-keyword">self</span>.name <span class="hljs-operator">=</span> name
+    <span class="hljs-keyword">self</span>.ingredients <span class="hljs-operator">=</span> ingredients
+    <span class="hljs-keyword">self</span>.extras <span class="hljs-operator">=</span> extras
   }
-}
-</code></pre>
+}</code></pre>
 <p>Unfortunately, by providing our own <code>init</code>, we take responsibility of updating it every time the shape of the <code>struct</code> changes.</p>
 <p>A different way to have a default value while also leveraging the compiler-generated <code>init</code> is to set it as part of the property definition.</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Pizza</span> </span>{
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Pizza</span> </span>{
 
   <span class="hljs-keyword">let</span> name: <span class="hljs-type">String</span>
   <span class="hljs-keyword">let</span> ingredients: [<span class="hljs-type">Ingredient</span>]
-  <span class="hljs-keyword">private</span>(<span class="hljs-keyword">set</span>) <span class="hljs-keyword">var</span> extras: [<span class="hljs-type">Ingredient</span>] = []
-}
-</code></pre>
+  <span class="hljs-keyword">private(set)</span> <span class="hljs-keyword">var</span> extras: [<span class="hljs-type">Ingredient</span>] <span class="hljs-operator">=</span> []
+}</code></pre>
 <p>It never occurred to me to do this because I try to keep my code as immutable as I can; using a <code>var</code> leaves the door open for mutations.</p>
 <p>On the other hand, the <code>private(set)</code> access control mitigates the mutable state risk: only the code internal to the <code>struct</code> can change the value of <code>extras</code>.</p>
 <p>That seems like a good tradeoff.

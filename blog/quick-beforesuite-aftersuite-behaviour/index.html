@@ -7,15 +7,17 @@
 <p><code>beforeSuite</code></p>
 <p>Defines a closure to be run <strong>prior to</strong> any examples in the test suite.
 You may define an unlimited number of these closures, but there is no guarantee as to the order in which they&#39;re run.</p>
+</blockquote>
+<blockquote>
 <p><code>afterSuite</code></p>
 <p>Defines a closure to be run <strong>after all</strong> of the examples in the test suite.
 You may define an unlimited number of these closures, but there is no guarantee as to the order in which they&#39;re run.</p>
 </blockquote>
 <p>The <a href="https://github.com/mokacoding/quick-beforeEach-afterEach-behaviour">example code</a> from the previous example has been updated adding calls to <code>beforeSuite</code> and <code>afterSuite</code>.</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">import</span> Quick
+<pre><code class="hljs swift"><span class="hljs-keyword">import</span> Quick
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Spec</span>: <span class="hljs-title">QuickSpec</span> </span>{
-  <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">spec</span><span class="hljs-params">()</span></span> {
+  <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">spec</span>()</span> {
     beforeSuite {
       <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;☕️ before suite&quot;</span>)
     }
@@ -42,11 +44,10 @@ You may define an unlimited number of these closures, but there is no guarantee 
       <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;🗑 after suite&quot;</span>)
     }
   }
-}
-</code></pre>
+}</code></pre>
 <p>In the code above <code>beforeSuite</code> and <code>afterSuite</code> are positioned at the very top and very bottom of the test, but you can put them anywhere inside a <code>describe</code> or <code>context</code>.</p>
 <p>Can you guess how the console log will look like?</p>
-<pre><code class="">☕️ <span class="hljs-built_in">before</span> suite
+<pre><code>☕️ <span class="hljs-built_in">before</span> suite
 😈 an <span class="hljs-built_in">after</span> suite call you weren&#x27;t aware of
 
 behaviour - some context - example <span class="hljs-number">1</span>
@@ -66,9 +67,8 @@ behaviour - other context - example <span class="hljs-number">2</span>
 ⭐️ <span class="hljs-built_in">top</span> <span class="hljs-built_in">after</span> each
 
 🗑 <span class="hljs-built_in">after</span> suite
-😈 an <span class="hljs-built_in">after</span> suite call you weren&#x27;t aware of
-</code></pre><p>Hang on a second, where do those 😈 logs come from?!</p>
-<h3 id="the-danger-of-using-beforesuite-and-aftersuite-">The danger of using <code>beforeSuite</code> and <code>afterSuite</code></h3>
+😈 an <span class="hljs-built_in">after</span> suite call you weren&#x27;t aware of</code></pre><p>Hang on a second, where do those 😈 logs come from?!</p>
+<h3 id="the-danger-of-using-beforesuite-and-aftersuite">The danger of using <code>beforeSuite</code> and <code>afterSuite</code></h3>
 <p>Quick will look for all the <code>beforeSuite</code> and <code>afterSuite</code> calls in all your test suite, and run them respectively all at the start and all at the end.</p>
 <p>Those unexpected 😈 console logs are simply defined in another spec in the project.</p>
 <p>This is one of the danger of <code>beforeSuite</code> and <code>afterSuite</code>, there is no way other that by doing a text search to know how many such calls there are and where.</p>
@@ -76,13 +76,12 @@ behaviour - other context - example <span class="hljs-number">2</span>
 <p>The other danger is that being able to fiddle with state in the unit tests can lead us to write tests that are not as isolated and robust as they should be. If unit tests are isolated and simple to setup then the code they test will be simple and easy to setup as well.</p>
 <p>Yes, <code>beforeSuite</code> and <code>afterSuite</code> can be life savers when you need to get started writing test on legacy code and you really cannot take out certain assupmtions baked in it. They allow you to work around them, and get the job done.</p>
 <p>In such cases though, I would encourage you to leave a big FIXME note there:</p>
-<pre><code class=""><span class="hljs-regexp">//</span> FIXME: Doing this now because the app makes assumptions that impact each
+<pre><code><span class="hljs-regexp">//</span> FIXME: Doing this now because the app makes assumptions that impact each
 <span class="hljs-regexp">//</span> unit test.
 <span class="hljs-regexp">//</span>
 <span class="hljs-regexp">//</span> Need to allocate proper time to refactor <span class="hljs-keyword">for</span> isolation.
 <span class="hljs-regexp">//</span>
-<span class="hljs-regexp">//</span> If you are reading this comment after &lt;date&gt; get <span class="hljs-keyword">in</span> touch with &lt;person&gt;.
-</code></pre><p>Until next time:</p>
+<span class="hljs-regexp">//</span> If you are reading this comment after &lt;date&gt; get <span class="hljs-keyword">in</span> touch with &lt;person&gt;.</code></pre><p>Until next time:</p>
 <p>👋 <em>Leave the codebase bettern than you found it</em></p>
 </div><div id="paginator" class="bottom-box clearfixed"><div class="col-6"><div><a href="/blog/symliks-in-git"><<&nbsp;Symbolic links in Git</a></div></div><div class="col-6"><div style="text-align: right"><a href="/blog/quick-beforeeach-aftereach-behaviour">Quick beforeEach and afterEach behaviour&nbsp;>></a></div></div></div><div id="subscribe" class="bottom-box"><!-- Begin Sendfox Signup Form -->
 <div id="sendfox_embed_signup">

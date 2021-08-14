@@ -5,27 +5,26 @@ They seem simple at first, then you hit on edge-cases such as leap years, daylig
 On top of that, there is the unstoppable passage of time, which can result in code that works in the present not working in the future.</p>
 <p><img src="https://imgs.xkcd.com/comics/supervillain_plan.png" alt="xkcd reference: Supervillain Plan"></p>
 <p style="text-align: center; font-size: smaller">
-<em>Source: <a href="https://xkcd.com/1883/">xkcd – Supervillain Plan</a>.</em>
+_Source: [xkcd – Supervillain Plan](https://xkcd.com/1883/)._
 </p>
 
 <p>Here&#39;s a simplified version of code I&#39;ve seen out in the wild more than once:</p>
-<pre><code class=" hljs swift"><span class="hljs-comment">// PromoCode.swift</span>
+<pre><code class="hljs swift"><span class="hljs-comment">// PromoCode.swift</span>
 <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">PromoCode</span> </span>{
     <span class="hljs-keyword">let</span> createdAt: <span class="hljs-type">Date</span>
     <span class="hljs-comment">// Expire after one year (without accounting for leap year)</span>
-    <span class="hljs-keyword">private</span> <span class="hljs-keyword">let</span> expiry: <span class="hljs-type">TimeInterval</span> = <span class="hljs-number">365</span> * <span class="hljs-number">24</span> * <span class="hljs-number">60</span> * <span class="hljs-number">60</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">let</span> expiry: <span class="hljs-type">TimeInterval</span> <span class="hljs-operator">=</span> <span class="hljs-number">365</span> <span class="hljs-operator">*</span> <span class="hljs-number">24</span> <span class="hljs-operator">*</span> <span class="hljs-number">60</span> <span class="hljs-operator">*</span> <span class="hljs-number">60</span>
 
-    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">isExpired</span><span class="hljs-params">()</span></span> -&gt; <span class="hljs-type">Bool</span> {
-        <span class="hljs-keyword">return</span> <span class="hljs-type">Date</span>().timeIntervalSince(createdAt) &gt; expiry
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">isExpired</span>()</span> -&gt; <span class="hljs-type">Bool</span> {
+        <span class="hljs-keyword">return</span> <span class="hljs-type">Date</span>().timeIntervalSince(createdAt) <span class="hljs-operator">&gt;</span> expiry
     }
 }
 
 <span class="hljs-comment">// PromoCodeTests.swift</span>
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testIsExpiredFalseBeforeOneYear</span><span class="hljs-params">()</span></span> {
-    <span class="hljs-keyword">let</span> promoCode = <span class="hljs-type">PromoCode</span>(createdAt: <span class="hljs-type">Date</span>.with(year: <span class="hljs-number">2020</span>, month: <span class="hljs-number">6</span>, day: <span class="hljs-number">7</span>))
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testIsExpiredFalseBeforeOneYear</span>()</span> {
+    <span class="hljs-keyword">let</span> promoCode <span class="hljs-operator">=</span> <span class="hljs-type">PromoCode</span>(createdAt: <span class="hljs-type">Date</span>.with(year: <span class="hljs-number">2020</span>, month: <span class="hljs-number">6</span>, day: <span class="hljs-number">7</span>))
     <span class="hljs-type">XCTAssertFalse</span>(promoCode.isExpired())
-}
-</code></pre>
+}</code></pre>
 <p><em>Note: <code>Date.with(year:, month:, day:)</code> is a syntax sugar method, not part of the standard library. You can find its source <a href="https://gist.github.com/mokagio/c1cb4fbdca1605b7659e0a0dcb62d08e">here</a>.</em></p>
 <p>If you are reading this post after June 7th, 2021, you probably spotted the issue.
 When the author wrote the test, it passed, but they didn&#39;t realize it would start failing once the clock reached June 7th, 2021.</p>
@@ -34,17 +33,16 @@ If they&#39;re in a rush, they may be tempted to bump the date a few years, whic
 <p>When testing Swift code that compares dates, it&#39;s essential to remove the influence of the passage of time to avoid unexpected failures in the future.</p>
 <p>There is a simple refactor we can make to avoid this issue once and for all.
 We can decouple the test from the system clock by <strong>injecting the reference date for the comparison operation</strong>.</p>
-<pre><code class=" hljs swift"><span class="hljs-comment">// PromoCode.swift</span>
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">isExpired</span><span class="hljs-params">(at referenceDate: Date = Date<span class="hljs-params">()</span></span></span>) -&gt; <span class="hljs-type">Bool</span> {
-    <span class="hljs-keyword">return</span> referenceDate.timeIntervalSince(createdAt) &gt; expiry
+<pre><code class="hljs swift"><span class="hljs-comment">// PromoCode.swift</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">isExpired</span>(<span class="hljs-params">at</span> <span class="hljs-params">referenceDate</span>: <span class="hljs-type">Date</span> <span class="hljs-operator">=</span> <span class="hljs-type">Date</span>())</span> -&gt; <span class="hljs-type">Bool</span> {
+    <span class="hljs-keyword">return</span> referenceDate.timeIntervalSince(createdAt) <span class="hljs-operator">&gt;</span> expiry
 }
 
 <span class="hljs-comment">// PromoCodeTests.swift</span>
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testIsExpiredFalseBeforeOneYear</span><span class="hljs-params">()</span></span> {
-    <span class="hljs-keyword">let</span> promoCode = <span class="hljs-type">PromoCode</span>(createdAt: <span class="hljs-type">Date</span>.with(year: <span class="hljs-number">2020</span>, month: <span class="hljs-number">6</span>, day: <span class="hljs-number">3</span>))
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testIsExpiredFalseBeforeOneYear</span>()</span> {
+    <span class="hljs-keyword">let</span> promoCode <span class="hljs-operator">=</span> <span class="hljs-type">PromoCode</span>(createdAt: <span class="hljs-type">Date</span>.with(year: <span class="hljs-number">2020</span>, month: <span class="hljs-number">6</span>, day: <span class="hljs-number">3</span>))
     <span class="hljs-type">XCTAssertFalse</span>(promoCode.isExpired(at: <span class="hljs-type">Date</span>.with(year: <span class="hljs-number">2021</span>, month: <span class="hljs-number">6</span>, day: <span class="hljs-number">3</span>)))
-}
-</code></pre>
+}</code></pre>
 <p>Relying on <code>Date()</code> makes your non-deterministic because it produces a different value literally every time you run the tests.
 Non-deterministic tests, that is, tests that don&#39;t behave in the same way every time you run them, cannot be trusted.
 They may fail at any time and distract developers who experience them while working on unrelated parts of the codebase.</p>

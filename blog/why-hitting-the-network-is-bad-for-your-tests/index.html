@@ -46,15 +46,14 @@ deeper look into OHHTTPStubs.</p>
 <h3 id="roll-your-own">Roll your own</h3>
 <p>Another option is to centralise all the network operations behind one single
 interface conforming to a protocol, for example:</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">protocol</span> <span class="hljs-title">NetworkService</span> </span>{
-  <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">performRequest</span><span class="hljs-params">(
-        url: NSURL,
-        method: Method,
-        parameters: [String: AnyObject]?,
-        comptletion: <span class="hljs-params">([String: AnyObject]?, NSError?)</span></span></span>
-  )
-}
-</code></pre>
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">protocol</span> <span class="hljs-title">NetworkService</span> </span>{
+  <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">performRequest</span>(
+        <span class="hljs-params">url</span>: <span class="hljs-type">NSURL</span>,
+        <span class="hljs-params">method</span>: <span class="hljs-type">Method</span>,
+        <span class="hljs-params">parameters</span>: [<span class="hljs-params">String</span>: <span class="hljs-type">AnyObject</span>]<span class="hljs-operator">?</span>,
+        <span class="hljs-params">comptletion</span>: ([String: <span class="hljs-type">AnyObject</span>]<span class="hljs-operator">?</span>, <span class="hljs-type">NSError</span>?)
+  )</span>
+}</code></pre>
 <p>All the components that need to interact with the network should be initialized
 with an instance of an object conforming to the <code>NetworkService</code> protocol to
 use for their requests.</p>

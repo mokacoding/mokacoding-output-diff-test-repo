@@ -4,7 +4,7 @@
 <p>We&#39;ve recently seen how using <a href="https://github.com/specta/specta">Specta</a> can help us writing <a href="https://mokacoding.com/blog/better-tests-with-specta">better unit</a>, <a href="https://mokacoding.com/blog/job-stories-acceptance-tests-with-kif-and-specta">and acceptance tests</a> for our Objective-C projects, but we can go one step further.</p>
 <p>The Specta team built a matcher library called <a href="https://github.com/specta/expecta">Expecta</a>. Expecta comes a number of expectation methods that provide developer writing tests the syntax and vocabulary they need to achieve the clarity they strive for so much.</p>
 <p>I am so confident in the readability of tests written with Specta and Expecta that I&#39;m gonna write the rest of this post as a spec:</p>
-<pre><code class=" hljs objc">SpecBegin(ExpectaPost)
+<pre><code class="hljs objc">SpecBegin(ExpectaPost)
 
 describe(<span class="hljs-string">@&quot;The expecta matcher libray&quot;</span>, ^{
     context(<span class="hljs-string">@&quot;has all the matchers you would expect&quot;</span>, ^{
@@ -79,8 +79,7 @@ describe(<span class="hljs-string">@&quot;The expecta matcher libray&quot;</span
     });
 });
 
-SpecEnd
-</code></pre>
+SpecEnd</code></pre>
 <p>What we just saw is only a subset of the matchers available with Expecta, you can find the full list on the <a href="https://github.com/specta/expecta#built-in-matchers">project&#39;s README</a>.</p>
 <p>Expecta is a very nice library, and I hope this post triggered some interest in you towards unit testing and the art of readable code, but it does not end here! You can actually extent Expecta by providing custom matchers. <del><strong>We are going to look at those next week</strong>, so don&#39;t forget to <a href="#subscribe">subscribe</a>.</del> If you&#39;re interested check out the next post: &quot;<a href="https://mokacoding.com/blog/expecta-custom-matchers/">How to write an Expecta custom matcher</a>&quot;, and don&#39;t forget to <a href="#subscribe">subscribe</a> to be notified when new posts about Expecta and the world of iOS unit testing are published.</p>
 </div><div id="paginator" class="bottom-box clearfixed"><div class="col-6"><div><a href="/blog/expecta-custom-matchers"><<&nbsp;Writing an Expecta custom matcher</a></div></div><div class="col-6"><div style="text-align: right"><a href="/blog/specta-global-before-after-each-updated">Specta global before and after each hooks (Updated)&nbsp;>></a></div></div></div><div id="subscribe" class="bottom-box"><!-- Begin Sendfox Signup Form -->

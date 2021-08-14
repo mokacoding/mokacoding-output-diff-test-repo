@@ -7,7 +7,8 @@ During WWII, he personified the United State&#39;s military research, organized 
 He was also a mentor to <a href="https://en.wikipedia.org/wiki/Claude_Shannon">Claude Shannon</a>, the father of the information age.</p>
 <p>One anecdote of Bush&#39;s career as an instructor at MIT particularly inspired me: his pipe wrench lecture.</p>
 <p>Bush would greet an auditorium filled with aspiring engineers, hold up a pipe wrench, and challenge them: &quot;Describe this&quot;.</p>
-<p><img src="https://mokacoding.s3.amazonaws.com/2020-10-21-pipe-wrench.jpg" style="margin: 0 auto; display: block" width=70% alt="image of a pipe wrench"/></p>
+<img src="https://mokacoding.s3.amazonaws.com/2020-10-21-pipe-wrench.jpg" style="margin: 0 auto; display: block" width=70% alt="image of a pipe wrench"/>
+
 <p style="text-align: center; opacity: .6; font-size: .85rem"><i>Not the actual pipe wrench showed by Bush, I found this one on Amazon.</i></p>
 
 <p>One by one, they would try, and each time Bush would dissect the description, pointing out where it was vague.</p>
@@ -25,34 +26,29 @@ That, Bush taught his students, was the beginning of engineering&quot;, write So
 <p>One way in which a domain representation can be vague is when it allows inconsistent state to occur.
 If you work in a language with a strong type system, like Swift, you can use precise types to make your domain modeling clearer and make undesirable state unrepresentable.</p>
 <p>For example, when modeling an operation that can either succeed with some data or fail with an error, you could use a type like this:</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Operation</span> </span>{
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Operation</span> </span>{
   <span class="hljs-keyword">let</span> success: <span class="hljs-type">Bool</span>
-  <span class="hljs-keyword">let</span> data: <span class="hljs-type">Data?</span>
-  <span class="hljs-keyword">let</span> error: <span class="hljs-type">Error?</span>
-}
-</code></pre>
+  <span class="hljs-keyword">let</span> data: <span class="hljs-type">Data</span>?
+  <span class="hljs-keyword">let</span> error: <span class="hljs-type">Error</span>?
+}</code></pre>
 <p>This type does the job but leaves room for errors: nothing stops you from creating an instance with <code>success</code> true but <code>data</code> nil or one with values in both <code>data</code> and <code>error</code>.</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">let</span> inconsistentOperation = <span class="hljs-type">Operation</span>(success: <span class="hljs-literal">false</span>, data: someData, error: .<span class="hljs-keyword">none</span>)
-</code></pre>
+<pre><code class="hljs swift"><span class="hljs-keyword">let</span> inconsistentOperation <span class="hljs-operator">=</span> <span class="hljs-type">Operation</span>(success: <span class="hljs-literal">false</span>, data: someData, error: .none)</code></pre>
 <p>Using the <a href="https://developer.apple.com/documentation/swift/result"><code>Result</code> <code>enum</code></a>, you can remove this ambiguity <em>at compile time</em>, making it impossible for both data and error to be set simultaneously.</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Operation</span> </span>{
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Operation</span> </span>{
   <span class="hljs-keyword">let</span> result: <span class="hljs-type">Result</span>&lt;<span class="hljs-type">Data</span>, <span class="hljs-type">Error</span>&gt;
-}
-</code></pre>
+}</code></pre>
 <p>Another useful <code>enum</code>, borrowed from the <a href="https://elm-lang.org/">Elm programming language</a>, is <a href="https://github.com/mokagio/RemoteData"><code>RemoteData</code></a>: a way to encapsulate the state of a network operation.</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">enum</span> <span class="hljs-title">RemoteData</span>&lt;<span class="hljs-title">T</span>&gt; </span>{
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">enum</span> <span class="hljs-title">RemoteData</span>&lt;<span class="hljs-title">T</span>&gt; </span>{
   <span class="hljs-keyword">case</span> notAsked
   <span class="hljs-keyword">case</span> loading
   <span class="hljs-keyword">case</span> loaded(<span class="hljs-type">T</span>)
   <span class="hljs-keyword">case</span> failed(<span class="hljs-type">Error</span>)
-}
-</code></pre>
+}</code></pre>
 <p><code>enum</code>s are not the only way tool to make your domain modeling more precise.
 <a href="https://github.com/pointfreeco/swift-nonempty"><code>NonEmpty</code></a> uses <a href="https://docs.swift.org/swift-book/LanguageGuide/Generics.html#ID186">type constrained generics</a> to represent <code>Collection</code>s that are not empty.</p>
-<pre><code class=" hljs swift"><span class="hljs-comment">// A non-empty array of integers</span>
-<span class="hljs-keyword">let</span> xs = <span class="hljs-type">NonEmpty</span>&lt;[<span class="hljs-type">Int</span>]&gt;(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>)
-xs.first + <span class="hljs-number">1</span> <span class="hljs-comment">// `first` is non-optional since it&#x27;s guaranteed to be present</span>
-</code></pre>
+<pre><code class="hljs swift"><span class="hljs-comment">// A non-empty array of integers</span>
+<span class="hljs-keyword">let</span> xs <span class="hljs-operator">=</span> <span class="hljs-type">NonEmpty</span>&lt;[<span class="hljs-type">Int</span>]&gt;(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>)
+xs.first <span class="hljs-operator">+</span> <span class="hljs-number">1</span> <span class="hljs-comment">// `first` is non-optional since it&#x27;s guaranteed to be present</span></code></pre>
 <p>Using <code>NonEmpty</code> adds clarity to the values you define, possibly avoiding runtime crashes by making it impossible to access via subscript an empty array.</p>
 <p>If you had to represent &quot;a collection of unique positive integers where order matters and with at least one element,&quot; you could use <code>[Int]</code>, or you could combine <code>NonEmpty</code>, <a href="https://github.com/Weebly/OrderedSet"><code>OrderedSet</code></a>, and <a href="https://developer.apple.com/documentation/swift/uint"><code>UInt</code></a> in <code>NonEmpty&lt;OrderedSet&lt;UInt&gt;&gt;</code>.</p>
 <p>Using <code>[Int]</code> might be simpler but leaves the door open for all sorts of inconsistent instances, like an empty array, an array with negative values, or one with more than one occurrences of the same value.

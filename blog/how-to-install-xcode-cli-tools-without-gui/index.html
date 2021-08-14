@@ -6,7 +6,7 @@
 <p><a href="http://railsapps.github.io/xcode-command-line-tools.html">Another option</a> is to open a Terminal and type <code>xcode-select --install</code>.</p>
 <p>Both the options above have a flaw: they require a GUI. That is not optimal when trying to setup a VM in an automated way.</p>
 <p>In <a href="http://apple.stackexchange.com/questions/107307/how-can-i-install-the-command-line-tools-completely-from-the-command-line">this AskDifferent answer</a> a solution without GUI is proposed, and here you can find my spin on it:</p>
-<pre><code class=""><span class="hljs-meta">#!/bin/bash</span>
+<pre><code><span class="hljs-meta">#!/bin/bash</span>
 
 <span class="hljs-comment"># See http://apple.stackexchange.com/questions/107307/how-can-i-install-the-command-line-tools-completely-from-the-command-line</span>
 
@@ -25,8 +25,7 @@ xcode-select -p &amp;&gt; /dev/null
   softwareupdate -i <span class="hljs-string">&quot;<span class="hljs-variable">$PROD</span>&quot;</span> -v;
 <span class="hljs-keyword">else</span>
   <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Xcode CLI tools OK&quot;</span>
-<span class="hljs-keyword">fi</span>
-</code></pre><p>Easy peasy ☺️ I also made a gist with this, which you can download <a href="https://gist.github.com/mokagio/b974620ee8dcf5c0671f">here</a>.</p>
+<span class="hljs-keyword">fi</span></code></pre><p>Easy peasy ☺️ I also made a gist with this, which you can download <a href="https://gist.github.com/mokagio/b974620ee8dcf5c0671f">here</a>.</p>
 <p><em>Happy coding, and leave the codebase better than you found it</em></p>
 </div><div id="paginator" class="bottom-box clearfixed"><div class="col-6"><div><a href="/blog/carthage-no-build"><<&nbsp;An even lighter way to use Carthage</a></div></div><div class="col-6"><div style="text-align: right"><a href="/blog/devworld2015-notes-of-a-testing-fanboy">/dev/world/2015 notes of a testing fanboy&nbsp;>></a></div></div></div><div id="subscribe" class="bottom-box"><!-- Begin Sendfox Signup Form -->
 <div id="sendfox_embed_signup">

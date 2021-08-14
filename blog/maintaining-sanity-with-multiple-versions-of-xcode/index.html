@@ -11,11 +11,11 @@ of Xcode in our dock, and that can sometimes be confusing.</p>
 running is the latest or the beta, as my dock is always hidden, and CLI builds
 failing because they&#39;ve been run with the wrong version of <code>xcodebuild</code>.</p>
 <p>In this post I&#39;ve listed some tools to help make it less so.</p>
-<h3 id="-xcode-toggle-https-github-com-schwa-xcode-toggle-"><a href="https://github.com/schwa/xcode-toggle">xcode-toggle</a></h3>
+<h3 id="xcode-toggle"><a href="https://github.com/schwa/xcode-toggle">xcode-toggle</a></h3>
 <p><a href="https://github.com/schwa/xcode-toggle"><code>xcode-toggle</code></a> by <a href="https://twitter.com/schwa">Jonathan Wight
 (@schwa)</a> is smart wrapper around <code>xcode-select
 --switch</code> that simplifies switching between toolchain versions.</p>
-<pre><code class="">$ xcode-toggle -t
+<pre><code>$ xcode-toggle -t
 Switching to: <span class="hljs-regexp">/Applications/</span>Xcode-beta.app
 <span class="hljs-regexp">/Applications/</span>Xcode-beta.app [Current]
 <span class="hljs-regexp">/Applications/</span>Xcode.app
@@ -23,9 +23,8 @@ Switching to: <span class="hljs-regexp">/Applications/</span>Xcode-beta.app
 $ xcode-toggle -t
 Switching to: <span class="hljs-regexp">/Applications/</span>Xcode.app
 <span class="hljs-regexp">/Applications/</span>Xcode-beta.app
-<span class="hljs-regexp">/Applications/</span>Xcode.app [Current]
-</code></pre><p>It&#39;s called <em>toggle</em> but it works with more than two versions of Xcode as well.</p>
-<h3 id="-betawarpaint-xcode-plugin-https-github-com-zats-betawarpaint-"><a href="https://github.com/zats/BetaWarpaint">BetaWarpaint Xcode plugin</a></h3>
+<span class="hljs-regexp">/Applications/</span>Xcode.app [Current]</code></pre><p>It&#39;s called <em>toggle</em> but it works with more than two versions of Xcode as well.</p>
+<h3 id="betawarpaint-xcode-plugin"><a href="https://github.com/zats/BetaWarpaint">BetaWarpaint Xcode plugin</a></h3>
 <p>This simple yet brilliant plugin by <a href="https://twitter.com/zats">Sash Zats
 </a> changes the style of the Xcode-beta toolbars
 and alerts making it striped.</p>

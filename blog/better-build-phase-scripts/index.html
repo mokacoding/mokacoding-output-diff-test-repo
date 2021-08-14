@@ -3,7 +3,8 @@
 </p></div></div></div></div><div class="page"><div class="row-12"><div class="col-12 header"><h1 class="brand"><a href="/">mokacoding</a></h1><div class="punchline">unit and acceptance testing, automation, productivity</div><div class="links"><a href="/archive.html">Archive</a><a href="/tags.html">Tags</a><a href="https://gio.codes">About</a><a href="#subscribe">Subscribe</a><a href="/feed.xml"><i class="fa fa-rss"></i></a></div></div><div class="col-12"><div class="post-container"><h2 class="post-title"><a href="/blog/better-build-phase-scripts">Better Xcode Run Script Build Phases</a></h2><p class="post-meta"><span class="post-date">Mon Nov 07 2016&nbsp;</span><a href="/tag/Xcode/index.html" class="post-tag">-Xcode</a></p><div class="post"><p>Xcode offers the possibility to run user defined code as part of the build
 process using the &quot;Run Script Phase&quot; in the &quot;Build Phases&quot; section.</p>
 <!-- Manually editing the HTML here because the image is small and we don't want to stretch it -->
-<p><img src="https://s3.amazonaws.com/mokacoding/2016-11-07-run-script-menu.png" alt="Build Phase Menu to add a Run Script Phase" style=" width: 300px;" /></p>
+<img src="https://s3.amazonaws.com/mokacoding/2016-11-07-run-script-menu.png" alt="Build Phase Menu to add a Run Script Phase" style=" width: 300px;" />
+
 <p>This is a very handy feature as it allows us to do things like:</p>
 <ul>
 <li><a href="https://mokacoding.com/blog/automatic-xcode-versioning-with-git/">Dynamically set the version and build number based on external parameters</a>, e.g. commits count</li>
@@ -41,8 +42,7 @@ post I hope this is it. Extract your scripts.</p>
 <p>You can then make your script executable by <a href="https://bash.cyberciti.biz/guide/Setting_up_permissions_on_a_script">changing its
 permission</a>
 using this command in the terminal:</p>
-<pre><code class="">chmod u+x Build-Phases/<span class="hljs-keyword">my</span>-<span class="hljs-keyword">script</span>.sh
-</code></pre><p>Finally you can replace the script content in the Xcode build phase editor with
+<pre><code>chmod u+x Build-Phases/<span class="hljs-keyword">my</span>-<span class="hljs-keyword">script</span>.sh</code></pre><p>Finally you can replace the script content in the Xcode build phase editor with
 a command to execute your script:</p>
 <p><code>$SRCROOT/Build-Phases/set-build-number</code></p>
 <p><img src="https://s3.amazonaws.com/mokacoding/2016-11-07-extracted-run-script.png" alt="Extracted run script"></p>
@@ -68,39 +68,35 @@ in the order they need to be.</p>
 <p>You can make your scripts output compilation errors or warnings the same way
 Xcode does. I learnt this a while ago <a href="http://briksoftware.com/blog/?p=120">from this
 post</a>.</p>
-<pre><code class=""><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;error: Your error message&quot;</span>
-<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;warning: Your warning message&quot;</span>
-</code></pre><p>This ability is quite handy, it allows you to communicate with the other
+<pre><code><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;error: Your error message&quot;</span>
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;warning: Your warning message&quot;</span></code></pre><p>This ability is quite handy, it allows you to communicate with the other
 developers using the script. You can use this for example to fail the build
 when required software is missing.</p>
 <h2 id="ensure-required-tools-are-available">Ensure required tools are available</h2>
 <p>A common use of run script build phases is to integrate third party tools into the build process, but what happens when such tools are not present in the developer&#39;s machine? It&#39;s a good idea to fail the build and inform them that their setup is incomplete. This is how you can do it:</p>
-<pre><code class=" hljs bash"><span class="hljs-built_in">set</span> -e
+<pre><code class="hljs bash"><span class="hljs-built_in">set</span> -e
 
 <span class="hljs-keyword">if</span> ! <span class="hljs-built_in">which</span> &lt;your tool&gt; &gt; /dev/null; <span class="hljs-keyword">then</span>
   <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;error: &lt;your tool&gt; is missing&quot;</span>
   <span class="hljs-built_in">exit</span> 1
-<span class="hljs-keyword">fi</span>
-</code></pre>
+<span class="hljs-keyword">fi</span></code></pre>
 <p>For example if you want to make sure new developers have SwiftLint installed, you can use this script:</p>
-<pre><code class=" hljs bash"><span class="hljs-built_in">set</span> -e
+<pre><code class="hljs bash"><span class="hljs-built_in">set</span> -e
 
 <span class="hljs-keyword">if</span> ! <span class="hljs-built_in">which</span> swiftlint &gt; /dev/null; <span class="hljs-keyword">then</span>
   <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;error: SwiftLint is not installed. Vistit http://github.com/realm/SwiftLint to learn more.&quot;</span>
   <span class="hljs-built_in">exit</span> 1
 <span class="hljs-keyword">fi</span>
 
-swiftlint
-</code></pre>
+swiftlint</code></pre>
 <p>Or if you feel that failing the build is too harsh, you can just throw a warning:</p>
-<pre><code class=" hljs bash"><span class="hljs-built_in">set</span> -e
+<pre><code class="hljs bash"><span class="hljs-built_in">set</span> -e
 
 <span class="hljs-keyword">if</span> ! <span class="hljs-built_in">which</span> swiftlint &gt; /dev/null; <span class="hljs-keyword">then</span>
   <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;warning: SwiftLint is not installed. Vistit http://github.com/realm/SwiftLint to learn more.&quot;</span>
 <span class="hljs-keyword">else</span>
   swiftlint
-<span class="hljs-keyword">fi</span>
-</code></pre>
+<span class="hljs-keyword">fi</span></code></pre>
 <h2 id="debug-tips">Debug tips</h2>
 <p>As with all software, run scripts phases don&#39;t usually come out right at the
 first try (<em>at least not for me</em>). Here&#39;s two debugging tips:</p>

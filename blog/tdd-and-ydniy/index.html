@@ -36,23 +36,21 @@ An so on...</p>
 <p>The same goes for writing the code that makes the tests pass.
 One of the exercises in the book is adding a spiciness visual indicator when displaying the name of each spicy item<sup id="fn-example-back"><a href="#fn-example">2</a></sup>.</p>
 <p>Here&#39;s the test for the &quot;adds spiciness indicator&quot; behavior:</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testWhenItemIsSpicyDisplayNameHasSpicinessIndicator</span><span class="hljs-params">()</span></span> {
-    <span class="hljs-keyword">let</span> item = <span class="hljs-type">MenuItem</span>(name: <span class="hljs-string">&quot;a name&quot;</span>, spicy: <span class="hljs-literal">true</span>)
-    <span class="hljs-keyword">let</span> displayName = item.displayName
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testWhenItemIsSpicyDisplayNameHasSpicinessIndicator</span>()</span> {
+    <span class="hljs-keyword">let</span> item <span class="hljs-operator">=</span> <span class="hljs-type">MenuItem</span>(name: <span class="hljs-string">&quot;a name&quot;</span>, spicy: <span class="hljs-literal">true</span>)
+    <span class="hljs-keyword">let</span> displayName <span class="hljs-operator">=</span> item.displayName
     <span class="hljs-type">XCTAssertEqual</span>(displayName, <span class="hljs-string">&quot;a name 🌶&quot;</span>)
-}
-</code></pre>
+}</code></pre>
 <p>The implementation for <code>displayName</code> can be some kind of if-else conditional based on the model&#39;s <code>spicy</code> property.
 Do we need that conditional logic to make that single test pass just yet?
 No, we can simply hardcode the result.</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">MenuItem</span> </span>{
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">MenuItem</span> </span>{
 
     <span class="hljs-keyword">let</span> name: <span class="hljs-type">String</span>
     <span class="hljs-keyword">let</span> spicy: <span class="hljs-type">Bool</span>
 
-    <span class="hljs-built_in">lazy</span> <span class="hljs-keyword">private</span>(<span class="hljs-keyword">set</span>) <span class="hljs-keyword">var</span> displayName: <span class="hljs-type">String</span> = <span class="hljs-string">&quot;\(name) 🌶&quot;</span>
-}
-</code></pre>
+    <span class="hljs-keyword">lazy</span> <span class="hljs-keyword">private(set)</span> <span class="hljs-keyword">var</span> displayName: <span class="hljs-type">String</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;<span class="hljs-subst">\(name)</span> 🌶&quot;</span>
+}</code></pre>
 <p>With a green test for this slice of behavior, we can refactor <code>displayName</code> to conditionally add the &quot;🌶&quot;.
 Or, we could move on with the next test, which will initially fail because of the hardcode implementation and require us to implement the conditional logic.</p>
 <p>Regardless of the next step, having a test in place that we can trust gives us the confidence to move forward.</p>
