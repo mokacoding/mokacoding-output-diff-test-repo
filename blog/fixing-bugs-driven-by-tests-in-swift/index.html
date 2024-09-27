@@ -15,34 +15,33 @@
 <p>Let&#39;s write a unit test that we&#39;ll have to make green in order to fix this bug. But how?</p>
 <p>Well first of all we need to find the code responsible for providing the data to the note table view. Turns out that there is a <code>NotesListDataSource</code> object that <code>NotesListViewController</code> uses in its implementation of the <code>UITableViewDataSource</code> methods.</p>
 <p>There are many ways to write the test for this bug, here&#39;s one:</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">NotesDataSourceTest</span>: <span class="hljs-title">XCTestCase</span> </span>{
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">NotesDataSourceTest</span>: <span class="hljs-title">XCTestCase</span> </span>{
 
   <span class="hljs-comment">// it sorts the notes by updated date</span>
-  <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testSortsNotesByUpdatesDate</span><span class="hljs-params">()</span></span> {
-    <span class="hljs-keyword">let</span> firstNote = <span class="hljs-type">Note</span>(name: <span class="hljs-string">&quot;any name&quot;</span>, content: <span class="hljs-string">&quot;any content&quot;</span>, lastUpdated: <span class="hljs-type">NSDate</span>().dateByAddingTimeInterval(<span class="hljs-number">60</span>))
-    <span class="hljs-keyword">let</span> secondNote = <span class="hljs-type">Note</span>(name: <span class="hljs-string">&quot;any other name&quot;</span>, content: <span class="hljs-string">&quot;any content&quot;</span>, lastUpdated: <span class="hljs-type">NSDate</span>())
-    <span class="hljs-keyword">let</span> thirdNote = <span class="hljs-type">Note</span>(name: <span class="hljs-string">&quot;yet another name&quot;</span>, content: <span class="hljs-string">&quot;any content&quot;</span>, lastUpdated: <span class="hljs-type">NSDate</span>().dateByAddingTimeInterval(-<span class="hljs-number">60</span>))
+  <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testSortsNotesByUpdatesDate</span>()</span> {
+    <span class="hljs-keyword">let</span> firstNote <span class="hljs-operator">=</span> <span class="hljs-type">Note</span>(name: <span class="hljs-string">&quot;any name&quot;</span>, content: <span class="hljs-string">&quot;any content&quot;</span>, lastUpdated: <span class="hljs-type">NSDate</span>().dateByAddingTimeInterval(<span class="hljs-number">60</span>))
+    <span class="hljs-keyword">let</span> secondNote <span class="hljs-operator">=</span> <span class="hljs-type">Note</span>(name: <span class="hljs-string">&quot;any other name&quot;</span>, content: <span class="hljs-string">&quot;any content&quot;</span>, lastUpdated: <span class="hljs-type">NSDate</span>())
+    <span class="hljs-keyword">let</span> thirdNote <span class="hljs-operator">=</span> <span class="hljs-type">Note</span>(name: <span class="hljs-string">&quot;yet another name&quot;</span>, content: <span class="hljs-string">&quot;any content&quot;</span>, lastUpdated: <span class="hljs-type">NSDate</span>().dateByAddingTimeInterval(<span class="hljs-operator">-</span><span class="hljs-number">60</span>))
 
-    <span class="hljs-keyword">let</span> sut = <span class="hljs-type">NotesDataSource</span>(notes: [thirdNote, firstNote, secondNote])
+    <span class="hljs-keyword">let</span> sut <span class="hljs-operator">=</span> <span class="hljs-type">NotesDataSource</span>(notes: [thirdNote, firstNote, secondNote])
 
     <span class="hljs-built_in">assert</span>(sut.noteAtIndexPath(<span class="hljs-type">NSIndexPath</span>(forRow: <span class="hljs-number">0</span>, inSection: <span class="hljs-number">0</span>)), isEqualTo: firstNote)
     <span class="hljs-built_in">assert</span>(sut.noteAtIndexPath(<span class="hljs-type">NSIndexPath</span>(forRow: <span class="hljs-number">1</span>, inSection: <span class="hljs-number">0</span>)), isEqualTo: secondNote)
     <span class="hljs-built_in">assert</span>(sut.noteAtIndexPath(<span class="hljs-type">NSIndexPath</span>(forRow: <span class="hljs-number">2</span>, inSection: <span class="hljs-number">0</span>)), isEqualTo: thirdNote)
   }
 
-  <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">assert</span><span class="hljs-params">(note: Note, isEqualTo otherNote: Note)</span></span> {
+  <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">assert</span>(<span class="hljs-params">note</span>: <span class="hljs-type">Note</span>, <span class="hljs-params">isEqualTo</span> <span class="hljs-params">otherNote</span>: <span class="hljs-type">Note</span>)</span> {
     <span class="hljs-type">XCTAssertEqual</span>(note.name, otherNote.name)
   }
-}
-</code></pre>
+}</code></pre>
 <p>Now if you run the tests, or got to <a href="https://github.com/mokacoding/SimpleNotes/commit/a7431b2bd7363a96a54d0609c133c6b8e069b2f7">this commit</a>, you&#39;ll see that they fail.</p>
 <p>Making the test pass, and therefore fixing the bug is as easy as <a href="https://github.com/mokacoding/SimpleNotes/commit/048fe2db5b6f37f1875dd21ea1c8592a89d33f94">adding a <code>sort</code> step when initializing the data source</a>.</p>
 <h2 id="fix-a-bug-with-an-acceptance-test">Fix a bug with an acceptance test</h2>
 <p>If you run Simple Notes you&#39;ll notice that nothing happens when selecting a note. That is outrageous! The expected behaviour is for the app to transition to a screen showing the details of the note.</p>
 <p>This kind of bug is related to the navigation of the application rather that its logic, and we can easily write an acceptance test. For example:</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testShowsNotesDetails</span><span class="hljs-params">()</span></span> {
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testShowsNotesDetails</span>()</span> {
   <span class="hljs-comment">// From the notes list screen</span>
-  <span class="hljs-keyword">let</span> app = <span class="hljs-type">XCUIApplication</span>()
+  <span class="hljs-keyword">let</span> app <span class="hljs-operator">=</span> <span class="hljs-type">XCUIApplication</span>()
 
   <span class="hljs-type">XCTAssertTrue</span>(app.anyViewWithIdentifier(<span class="hljs-string">&quot;notes_list_screen&quot;</span>).exists)
 
@@ -55,8 +54,7 @@
 
   <span class="hljs-comment">// Go back</span>
   app.backButton().tap()
-}
-</code></pre>
+}</code></pre>
 <p>Note that because the app is currently broken I had to write that test manually, rather then recording it. But that&#39;s ok, after playing around with the UI testing APIs you will get familiar with them and writing acceptance test will be a smooth experience.</p>
 <p>Also note that the approach used in that test is to assert the presence of an accessibility element with a certain identifier. That is a simple trick I use that decouples tests for the user navigation in the app from the content on UI itself. In fact, the accessibility identifier is set on the view controller&#39;s main view.</p>
 <p>In my opinion this approach is better that, for example, asserting the presence of views containing the title and content of a note because:</p>

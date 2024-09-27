@@ -4,18 +4,17 @@
 <p>Adding a share to Hacker News button to your blog is super easy thanks to <a href="https://segment.io/">the work</a> of the guys at <a href="https://segment.io/">Segment.io</a>.</p>
 <p>You can go to their <a href="https://segment.io/">Hacker News Button website</a> to use a wizard to configure the button and get the code, or use the same one I use for mokacoding.</p>
 <p><a href="http://jade-lang.com/">Jade</a> version:</p>
-<pre><code class=" hljs jade">script.
-  !<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">d,s,id</span>)</span>{<span class="hljs-keyword">var</span> js,fjs=d.getElementsByTagName(s)[<span class="hljs-number">0</span>],p=<span class="hljs-regexp">/^http:/</span>.test(d.location)?<span class="hljs-string">&#x27;http&#x27;</span>:<span class="hljs-string">&#x27;https&#x27;</span>;<span class="hljs-keyword">if</span>(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+<span class="hljs-string">&#x27;://platform.twitter.com/widgets.js&#x27;</span>;fjs.parentNode.insertBefore(js,fjs);}}(<span class="hljs-built_in">document</span>, <span class="hljs-string">&#x27;script&#x27;</span>, <span class="hljs-string">&#x27;twitter-wjs&#x27;</span>);
+<pre><code class="hljs jade">script.
+  !<span class="hljs-keyword">function</span>(d,s,id){<span class="hljs-keyword">var</span> js,fjs=d.getElementsByTagName(s)[<span class="hljs-number">0</span>],p=<span class="hljs-regexp">/^http:/</span>.test(d.location)?<span class="hljs-string">&#x27;http&#x27;</span>:<span class="hljs-string">&#x27;https&#x27;</span>;<span class="hljs-keyword">if</span>(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+<span class="hljs-string">&#x27;://platform.twitter.com/widgets.js&#x27;</span>;fjs.parentNode.insertBefore(js,fjs);}}(<span class="hljs-built_in">document</span>, <span class="hljs-string">&#x27;script&#x27;</span>, <span class="hljs-string">&#x27;twitter-wjs&#x27;</span>);
 
 a.hn-button(href=<span class="hljs-string">&quot;https://news.ycombinator.com/submit&quot;</span>,
-  <span class="hljs-string">&#x27;data-title&#x27;</span>=<span class="hljs-string">&quot;#{post.title}&quot;</span>,
-  <span class="hljs-string">&#x27;data-url&#x27;</span>=<span class="hljs-string">&quot;#{post.url}&quot;</span>,
+  <span class="hljs-string">&#x27;data-title&#x27;</span>=<span class="hljs-string">&quot;<span class="hljs-subst">#{post.title}</span>&quot;</span>,
+  <span class="hljs-string">&#x27;data-url&#x27;</span>=<span class="hljs-string">&quot;<span class="hljs-subst">#{post.url}</span>&quot;</span>,
   <span class="hljs-string">&#x27;data-count&#x27;</span>=<span class="hljs-string">&quot;horizontal&quot;</span>,
   <span class="hljs-string">&#x27;data-style&#x27;</span>=<span class="hljs-string">&quot;twitter&quot;</span>).
-      Vote <span class="hljs-keyword">on</span> Hacker News
-</code></pre>
+      Vote <span class="hljs-literal">on</span> Hacker News</code></pre>
 <p>HTML version:</p>
-<pre><code class=" hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript">
+<pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript">
   !<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">d,s,id</span>)</span>{<span class="hljs-keyword">var</span> js,fjs=d.getElementsByTagName(s)[<span class="hljs-number">0</span>],p=<span class="hljs-regexp">/^http:/</span>.test(d.location)?<span class="hljs-string">&#x27;http&#x27;</span>:<span class="hljs-string">&#x27;https&#x27;</span>;<span class="hljs-keyword">if</span>(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+<span class="hljs-string">&#x27;://platform.twitter.com/widgets.js&#x27;</span>;fjs.parentNode.insertBefore(js,fjs);}}(<span class="hljs-built_in">document</span>, <span class="hljs-string">&#x27;script&#x27;</span>, <span class="hljs-string">&#x27;twitter-wjs&#x27;</span>);
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 
@@ -26,8 +25,7 @@ a.hn-button(href=<span class="hljs-string">&quot;https://news.ycombinator.com/su
   <span class="hljs-attr">data-count</span>=<span class="hljs-string">&quot;horizontal&quot;</span>,
   <span class="hljs-attr">data-style</span>=<span class="hljs-string">&quot;twitter&quot;</span>&gt;</span>
   Vote on Hacker News
-<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span>
-</code></pre>
+<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span></code></pre>
 <p>There you go. If you found this post useful I would really appreciate if you could hit my Hacker News button, and the ones next to it too 😎.</p>
 <p><em>Happy coding, and leave the codebase better than you found it.</em></p>
 </div><div id="paginator" class="bottom-box clearfixed"><div class="col-6"><div><a href="/blog/xcode-plugins-update"><<&nbsp;How to update an Xcode plug-in for the latest version of Xcode</a></div></div><div class="col-6"><div style="text-align: right"><a href="/blog/install-xcode-plugin-with-fastlane">Installing Xcode plugins from the terminal with Fastlane&nbsp;>></a></div></div></div><div id="subscribe" class="bottom-box"><!-- Begin Sendfox Signup Form -->

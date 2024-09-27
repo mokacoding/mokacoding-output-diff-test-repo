@@ -3,68 +3,67 @@
 </p></div></div></div></div><div class="page"><div class="row-12"><div class="col-12 header"><h1 class="brand"><a href="/">mokacoding</a></h1><div class="punchline">unit and acceptance testing, automation, productivity</div><div class="links"><a href="/archive.html">Archive</a><a href="/tags.html">Tags</a><a href="https://gio.codes">About</a><a href="#subscribe">Subscribe</a><a href="/feed.xml"><i class="fa fa-rss"></i></a></div></div><div class="col-12"><div class="post-container"><h2 class="post-title"><a href="/blog/running-tests-from-the-terminal">How to run Xcode tests from the terminal</a></h2><p class="post-meta"><span class="post-date">Last updated: Fri Jan 08 2021&nbsp;</span><a href="/tag/Testing/index.html" class="post-tag">-Testing</a><a href="/tag/Xcode/index.html" class="post-tag">-Xcode</a><a href="/tag/Terminal/index.html" class="post-tag">-Terminal</a><a href="/tag/Automation/index.html" class="post-tag">-Automation</a></p><div class="post"><p>This post shows how to run Xcode unit tests and UI tests from your terminal and how to format the output for readability with <a href="https://github.com/thii/xcbeautify"><code>xcbeautify</code></a> and <a href="https://github.com/xcpretty/xcpretty"><code>xcpretty</code></a>.</p>
 <p>Running the tests from the command line is a necessary step for <a href="https://mokacoding.com/tag/CI/index.html">Continuous Integration</a> and can come in handy when working solo, too.
 For example, you might want to run a script to automate publishing a build to TestFlight and run the unit and UI test suites as a pre-check.</p>
-<h2 id="running-tests-with-xcodebuild-">Running tests with <code>xcodebuild</code></h2>
+<h2 id="running-tests-with-xcodebuild">Running tests with <code>xcodebuild</code></h2>
 <p>When you need to interact with an Xcode project from the terminal, <code>xcodebuild</code> is the first place to look in.
 This command-line tool allows you to perform different <em>actions</em> on an Xcode project or workspace, such as building, archiving, querying information, and of course, testing.</p>
 <p>The <code>test</code> action is what you use to run tests from a certain scheme in an Xcode project:</p>
-<pre><code class="">xcodebuild <span class="hljs-string">\</span>
+<pre><code>xcodebuild <span class="hljs-string">\</span>
   -project MyAwesomeApp.xcodeproj <span class="hljs-string">\</span>
   -scheme MyAwesomeApp <span class="hljs-string">\</span>
   -sdk iphonesimulator <span class="hljs-string">\</span>
   -destination <span class="hljs-string">&#x27;platform=iOS Simulator,name=iPhone 12,OS=14.3&#x27;</span> <span class="hljs-string">\</span>
-  test
-</code></pre><p>If your app uses a workspace, perhaps because of <a href="https://cocoapods.org/">CocoaPods</a>, you&#39;ll need to pass the <code>-workspace</code> option instead of <code>-project</code>: <code>-workspace MyAwesomeApp.xcworkspace</code>.</p>
+  test</code></pre><p>If your app uses a workspace, perhaps because of <a href="https://cocoapods.org/">CocoaPods</a>, you&#39;ll need to pass the <code>-workspace</code> option instead of <code>-project</code>: <code>-workspace MyAwesomeApp.xcworkspace</code>.</p>
 <p>You can <a href="http://mokagio.github.io/tech-journal/2015/03/12/xcode-list-available-devices.html">run <code>instruments -s devices</code> to see a list of know devices</a> to use as the <code>-destination</code> option.
 Checkout my <a href="https://mokacoding.com/blog/xcodebuild-destination-options/"><code>xcodebuild</code> destination cheatsheet</a> for more <code>-destination</code> tips &amp; tricks.</p>
 <p><code>xcodebuild</code> produces a <em>dense</em> output:</p>
 <!-- ![xcodebuild test output](https://s3.amazonaws.com/mokacoding/xcodebuild-vanilla.gif) -->
+
 <p>While it&#39;s great to have all of the build information at hand, most of it is irrelevant for the tests.
 And all of that text will make it impossible to scroll back in your terminal window and take up unnecessary space in your CI logs.</p>
 <p>Luckily, there are tools to format the raw <code>xcodebuild</code> input into something concise and informative.
 I have two to recommend: the Swift-based <code>xcbeautify</code> and the Ruby-based <code>xcpretty</code>.</p>
-<h2 id="running-tests-with-xcodebuild-and-xcbeautify-">Running tests with <code>xcodebuild</code> and <code>xcbeautify</code></h2>
+<h2 id="running-tests-with-xcodebuild-and-xcbeautify">Running tests with <code>xcodebuild</code> and <code>xcbeautify</code></h2>
 <p><code>xcbeautify</code> is a little Swift package that makes the <code>xcodebuild</code> output human-readable.</p>
 <p>There are multiple ways to <a href="https://github.com/thii/xcbeautify/tree/d2d1d466f72170c45554ad218e4421dd04706e4e#installation">install <code>xcbeautify</code></a>, the most straightforward being with <a href="https://brew.sh/">Homebrew</a>: <code>brew install xcbeautify</code>.</p>
 <p>Once installed, using <code>xcbeautify</code> is simply a matter of piping the <code>xcodebuild</code> output through it:</p>
-<pre><code class="">xcodebuild <span class="hljs-string">\</span>
+<pre><code>xcodebuild <span class="hljs-string">\</span>
   -workspace MyAwesomeApp.xcworkspace <span class="hljs-string">\</span>
   -scheme MyAwesomeApp <span class="hljs-string">\</span>
   -sdk iphonesimulator <span class="hljs-string">\</span>
   -destination <span class="hljs-string">&#x27;platform=iOS Simulator,name=iPhone 12,OS=14.3&#x27;</span> <span class="hljs-string">\</span>
   test <span class="hljs-string">\</span>
-  | xcbeautify
-</code></pre><!-- ![Screenshot with the xcbeautify output]() -->
+  | xcbeautify</code></pre><!-- ![Screenshot with the xcbeautify output]() -->
+
 <p>You can use <code>xcbeautify</code> the Swift Package Manager and the <a href="https://bazel.build/">Bazel</a> build system output, too.</p>
 <p>If you are working on a project that doesn&#39;t rely on CocoaPods or <a href="https://fastlane.tools/">Fastlane</a>, then <code>xcbeautify</code> is an excellent and lightweight tool to use.</p>
 <p>If, on the other hand, you already have <a href="https://mokacoding.com/blog/ruby-for-ios-developers-bundler/">Ruby tooling</a> in your project setup, then it might be simpler to use <code>xcpretty</code>.
 Fastlane <a href="https://github.com/fastlane/fastlane/blob/e2ff4990a44f28fa7b25d745666007dc8e315577/fastlane.gemspec#L61">ships with <code>xcpretty</code></a> so you don&#39;t have to add an extra step in your CI to install it.</p>
 <p>Another scenario in which you might want to use <code>xcpretty</code> is if you want a different output format as it offers more formatters.</p>
-<h2 id="running-tests-with-xcodebuild-and-xcpretty-">Running tests with <code>xcodebuild</code> and <code>xcpretty</code></h2>
+<h2 id="running-tests-with-xcodebuild-and-xcpretty">Running tests with <code>xcodebuild</code> and <code>xcpretty</code></h2>
 <p>To install <code>xcpretty</code>, add it to your <code>Gemfile</code> then run <code>bundle install</code>:</p>
-<pre><code class=" hljs ruby"><span class="hljs-comment"># Gemfile</span>
-gem <span class="hljs-string">&quot;xcpretty&quot;</span>
-</code></pre>
+<pre><code class="hljs ruby"><span class="hljs-comment"># Gemfile</span>
+gem <span class="hljs-string">&quot;xcpretty&quot;</span></code></pre>
 <p>You can also install it globally via <code>gem install xcpretty</code>, but <a href="https://mokacoding.com/blog/ruby-for-ios-developers-bundler/">using a <code>Gemfile</code> to manage your Ruby tools</a> makes it easier for a team and CI to always run on the same versions, avoiding &quot;it works on my machine&quot; issues.</p>
 <p>Once you&#39;re setup, you can format the <code>xcodebuild</code> output by piping it through <code>xcpretty</code>:</p>
-<pre><code class="">xcodebuild <span class="hljs-string">\</span>
+<pre><code>xcodebuild <span class="hljs-string">\</span>
   -workspace MyAwesomeApp.xcworkspace <span class="hljs-string">\</span>
   -scheme MyAwesomeApp <span class="hljs-string">\</span>
   -sdk iphonesimulator <span class="hljs-string">\</span>
   -destination <span class="hljs-string">&#x27;platform=iOS Simulator,name=iPhone 12,OS=14.3&#x27;</span> <span class="hljs-string">\</span>
   test <span class="hljs-string">\</span>
-  | bundle exec xcpretty
-</code></pre><!-- ![xcodebuild test with xcpretty output](https://s3.amazonaws.com/mokacoding/xcodebuild-xcpretty.gif) -->
+  | bundle exec xcpretty</code></pre><!-- ![xcodebuild test with xcpretty output](https://s3.amazonaws.com/mokacoding/xcodebuild-xcpretty.gif) -->
+
 <p><em>If you set up <code>xcpretty</code> via <code>gem install</code>, you don&#39;t need to call it via <code>bundle exec</code>.</em></p>
 <p>For a more concise output, <code>xcpretty</code> can use the same formatting style as <a href="http://rspec.info/">RSpec</a>, which shows a dot for each test.
 Optionally, you can also color the dot green if the test passed or red otherwise.</p>
-<pre><code class="">xcodebuild <span class="hljs-string">\</span>
+<pre><code>xcodebuild <span class="hljs-string">\</span>
   -workspace MyAwesomeApp.xcworkspace <span class="hljs-string">\</span>
   -scheme MyAwesomeApp <span class="hljs-string">\</span>
   -sdk iphonesimulator <span class="hljs-string">\</span>
   -destination <span class="hljs-string">&#x27;platform=iOS Simulator,name=iPhone 12,OS=14.3&#x27;</span> <span class="hljs-string">\</span>
   test <span class="hljs-string">\</span>
-  | bundle exec xcpretty --test --color
-</code></pre><!-- ![xcodebuild test with xcpretty RSpec style output](https://s3.amazonaws.com/mokacoding/xcodebuild-xcpretty-test.gif) -->
+  | bundle exec xcpretty --test --color</code></pre><!-- ![xcodebuild test with xcpretty RSpec style output](https://s3.amazonaws.com/mokacoding/xcodebuild-xcpretty-test.gif) -->
+
 <p>There are more formatters to choose from and other configuration options you can learn about <a href="https://github.com/xcpretty/xcpretty">in the project&#39;s <code>README</code></a>.</p>
 <hr>
 <p>Whether you decide to run your tests with vanilla <code>xcodebuild</code> or format their output with <code>xcbeautify</code> or <code>xcpretty</code>, I hope you found this tutorial useful.</p>

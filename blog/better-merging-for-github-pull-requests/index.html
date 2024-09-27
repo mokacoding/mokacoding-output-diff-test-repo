@@ -11,13 +11,11 @@ You bet!</p>
 Obvious, yes, but sometimes not desirable and other times not possible because of established team conventions.
 This post doesn&#39;t want to be an argument for merging vs. squashing.
 The idea of keeping a clear and informative Git history is valid regardless of how we get our changes into it.</em></p>
-<h2 id="why-does-the-merge-commit-title-matter-">Why does the merge commit title matter?</h2>
+<h2 id="why-does-the-merge-commit-title-matter">Why does the merge commit title matter?</h2>
 <p>Imagine someone offered you a million dollars if you can guess what the latest commit on a repository does by only reading its title.
 Would you rather the commit title was this:</p>
-<pre><code class=""><span class="hljs-meta">Merge</span> pull request #123 <span class="hljs-meta">from</span> <span class="hljs-meta">add</span>-author-<span class="hljs-meta">label</span>
-</code></pre><p>or this:</p>
-<pre><code class="">Add author <span class="hljs-keyword">label</span> <span class="hljs-keyword">to</span> blogpost description view (<span class="hljs-string">#123</span>)
-</code></pre><p>Obviously, no one will ever ask you to guess what a commit does only by reading its title – let alone offer you a million dollars.
+<pre><code><span class="hljs-meta">Merge</span> pull request #123 <span class="hljs-meta">from</span> <span class="hljs-meta">add</span>-author-<span class="hljs-meta">label</span></code></pre><p>or this:</p>
+<pre><code>Add author <span class="hljs-keyword">label</span> <span class="hljs-keyword">to</span> blogpost description view (<span class="hljs-string">#123</span>)</code></pre><p>Obviously, no one will ever ask you to guess what a commit does only by reading its title – let alone offer you a million dollars.
 Still, understanding what code does and working with it is something you are being paid for.
 The easier you can do that the more value you can bring to the table.</p>
 <p>It&#39;s true that the GitHub UI makes it easy to bring up extra information for a commit, as well as the PR it belongs to.
@@ -35,19 +33,17 @@ If you can shorten the path to understanding your Git history, every developer w
 <p>The <code>git log</code> command has an option called <code>--first-parents</code> to follow only the first parent commit upon seeing a merge commit.
 When applied to the log on the main branch of a repository, where all the PRs get merged, the result is a list of merge commits only.</p>
 <p>Compare the output when using a descriptive title to the PR merge commit vs. the default one:</p>
-<pre><code class="">$ git log --pretty=oneline --abbrev-commit --first-parent
+<pre><code>$ git log <span class="hljs-comment">--pretty=oneline --abbrev-commit --first-parent</span>
 
-a2055b7 (HEAD -&gt; trunk, origin/trunk) Merge pull request #<span class="hljs-number">4</span> <span class="hljs-keyword">from</span> mokagio/feature-author-label
-<span class="hljs-number">64344e0</span> Merge pull request #<span class="hljs-number">3</span> <span class="hljs-keyword">from</span> mokagio/improve-mobile-layout
-<span class="hljs-number">70</span>ba8ac Merge pull request #<span class="hljs-number">2</span> <span class="hljs-keyword">from</span> mokagio/feature-more-negative-space
-<span class="hljs-number">7</span>d5c9da Merge pull request #<span class="hljs-number">1</span> <span class="hljs-keyword">from</span> mokagio/feature-dark-mode-css-support
-</code></pre><pre><code class="">git <span class="hljs-built_in">log</span> <span class="hljs-comment">--pretty=oneline --abbrev-commit --first-parent</span>
+a2055b7 (HEAD <span class="hljs-operator">-</span><span class="hljs-operator">&gt;</span> trunk, origin<span class="hljs-operator">/</span>trunk) <span class="hljs-keyword">Merge</span> pull request #<span class="hljs-number">4</span> <span class="hljs-keyword">from</span> mokagio<span class="hljs-operator">/</span>feature<span class="hljs-operator">-</span>author<span class="hljs-operator">-</span>label
+<span class="hljs-number">64344e0</span> <span class="hljs-keyword">Merge</span> pull request #<span class="hljs-number">3</span> <span class="hljs-keyword">from</span> mokagio<span class="hljs-operator">/</span>improve<span class="hljs-operator">-</span>mobile<span class="hljs-operator">-</span>layout
+<span class="hljs-number">70</span>ba8ac <span class="hljs-keyword">Merge</span> pull request #<span class="hljs-number">2</span> <span class="hljs-keyword">from</span> mokagio<span class="hljs-operator">/</span>feature<span class="hljs-operator">-</span>more<span class="hljs-operator">-</span>negative<span class="hljs-operator">-</span>space
+<span class="hljs-number">7</span>d5c9da <span class="hljs-keyword">Merge</span> pull request #<span class="hljs-number">1</span> <span class="hljs-keyword">from</span> mokagio<span class="hljs-operator">/</span>feature<span class="hljs-operator">-</span>dark<span class="hljs-operator">-</span>mode<span class="hljs-operator">-</span>css<span class="hljs-operator">-</span>support</code></pre><pre><code>git <span class="hljs-built_in">log</span> <span class="hljs-comment">--pretty=oneline --abbrev-commit --first-parent</span>
 
 a2055b7 (HEAD -&gt; trunk, origin/trunk) Add author label <span class="hljs-built_in">to</span> <span class="hljs-built_in">post</span> metadata component (<span class="hljs-comment">#4)</span>
 <span class="hljs-number">64344e0</span> Improve layout <span class="hljs-keyword">on</span> <span class="hljs-title">mobile</span> <span class="hljs-title">devices</span> (#<span class="hljs-title">3</span>)
 <span class="hljs-number">70</span>ba8ac Use more negative <span class="hljs-literal">space</span> (<span class="hljs-comment">#2)</span>
-<span class="hljs-number">7</span>d5c9da Support dark mode via CSS media query (<span class="hljs-comment">#1)</span>
-</code></pre><p>The second log reads like a story.
+<span class="hljs-number">7</span>d5c9da Support dark mode via CSS media query (<span class="hljs-comment">#1)</span></code></pre><p>The second log reads like a story.
 The first has little information to offer other than the fact that stuff got merge in this branch.</p>
 <p>When you pull the latest changes from your main branch, you can run this filtered <code>git log</code> to get an idea of the recent changes.
 <em>Tip</em>: define <a href="https://mokacoding.com/blog/terminal-aliases/">an alias for it</a> to make it easier to call it; mine is <code>glgf</code>.</p>

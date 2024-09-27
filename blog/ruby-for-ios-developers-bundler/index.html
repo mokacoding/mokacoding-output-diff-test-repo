@@ -33,30 +33,26 @@ time going through every Ruby tool they need. You also realise that you&#39;ve b
 using version 1.0.0.beta.3 of CocoaPods, you like leaving on the edge, and want
 to make sure they&#39;ll use it as well. It&#39;s time to setup Bundler!</p>
 <p>Bundler is a Ruby tool itself, so you can install it like this:</p>
-<pre><code class="">gem <span class="hljs-keyword">install</span> bundler
-</code></pre><p>Once installed you can setup your project to use Bundler with this command from
+<pre><code>gem <span class="hljs-keyword">install</span> bundler</code></pre><p>Once installed you can setup your project to use Bundler with this command from
 the root of your project:</p>
-<pre><code class="">bundle <span class="hljs-keyword">init</span>
-</code></pre><p>Note how the executable is called <code>bundle</code> while the tool is call Bundler. If
+<pre><code>bundle <span class="hljs-keyword">init</span></code></pre><p>Note how the executable is called <code>bundle</code> while the tool is call Bundler. If
 you think about it it does make sense, as you us a bundler to bundle things,
 but we can all agree that it is a confusing name choice.</p>
 <p>This will generate a template <code>Gemfile</code>. Like a <code>Podfile</code>, a <code>Gemfile</code> is
 actually a Ruby file in which you can use a special <a href="https://en.wikipedia.org/wiki/Domain-specific_language">DSL</a>
 to specify which dependencies you are using, and their version.</p>
 <p>This is how a <code>Gemfile</code> for an iOS project might look like:</p>
-<pre><code class=" hljs ruby">source <span class="hljs-string">&quot;https://rubygems.org&quot;</span>
+<pre><code class="hljs ruby">source <span class="hljs-string">&quot;https://rubygems.org&quot;</span>
 
 gem <span class="hljs-string">&#x27;cocoapods&#x27;</span>, <span class="hljs-string">&#x27;1.0.0.beta.3&#x27;</span>
-gem <span class="hljs-string">&#x27;fastlane&#x27;</span>, <span class="hljs-string">&#x27;~&gt; 1.57.0&#x27;</span>
-</code></pre>
+gem <span class="hljs-string">&#x27;fastlane&#x27;</span>, <span class="hljs-string">&#x27;~&gt; 1.57.0&#x27;</span></code></pre>
 <p>The string after the gem names informs Bundler on the version requirement. In
 our case CocoaPods should be exactly at version 1.0.0.beta.3, while Fastlane
 latest version that is greater or equal than 1.57.0, but less that 1.58.0.</p>
 <p><em>Fun fact:</em> Bundler and CocoaPods share the same dependency resolution library,
 <a href="https://github.com/CocoaPods/Molinillo">molinillo</a>.</p>
 <p>To install your dependencies simply run:</p>
-<pre><code class="">bundle <span class="hljs-keyword">install</span>
-</code></pre><h2 id="bundle-exec">Bundle Exec</h2>
+<pre><code>bundle <span class="hljs-keyword">install</span></code></pre><h2 id="bundle-exec">Bundle Exec</h2>
 <p>Installing the right version of a given tool is only the start, actually using the tool is what matters.</p>
 <p>I can sometimes happen to be working on different projects at the same time
 which are using different versions of a tool. Sometimes is not wise to always
@@ -66,8 +62,7 @@ be structured in an incompatible way.</p>
 you can rely on Bundler to make sure you are actually using your tools in the
 version specified in the <code>Gemfile</code>. This can be done by calling them through
 Bundler via <code>bundle exec</code>, for example:</p>
-<pre><code class="">bundle <span class="hljs-built_in">exec</span> pod install
-</code></pre><p>That&#39;s quite verbose, so I&#39;d recommend to use an <a href="https://en.wikipedia.org/wiki/Alias_(command">alias</a>)
+<pre><code>bundle <span class="hljs-built_in">exec</span> pod install</code></pre><p>That&#39;s quite verbose, so I&#39;d recommend to use an <a href="https://en.wikipedia.org/wiki/Alias_(command)">alias</a>
 for that. Mine is <code>be</code>, I actually have two special aliases for CocoaPods and
 Fastlane, <code>bp</code> and <code>bf</code>.</p>
 <hr>

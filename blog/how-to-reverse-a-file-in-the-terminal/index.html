@@ -3,7 +3,7 @@
 </p></div></div></div></div><div class="page"><div class="row-12"><div class="col-12 header"><h1 class="brand"><a href="/">mokacoding</a></h1><div class="punchline">unit and acceptance testing, automation, productivity</div><div class="links"><a href="/archive.html">Archive</a><a href="/tags.html">Tags</a><a href="https://gio.codes">About</a><a href="#subscribe">Subscribe</a><a href="/feed.xml"><i class="fa fa-rss"></i></a></div></div><div class="col-12"><div class="post-container"><h2 class="post-title"><a href="/blog/how-to-reverse-a-file-in-the-terminal">How to reverse a file in the terminal</a></h2><p class="post-meta"><span class="post-date">Sat Aug 22 2020&nbsp;</span><a href="/tag/Espresso/index.html" class="post-tag">-Espresso</a></p><div class="post"><p>Today, I used <code>grep</code> to filter the <code>git log</code> output to only get the changes made on a certain value holding the version number for an app.</p>
 <p>The <code>git log</code> output is sorted newest to oldest, but I was interested in how the changes progressed, that is, oldest to newest.</p>
 <p><strong>You can use <a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#tac-invocation"><code>tac</code></a> to reverse a file or the standard input.</strong></p>
-<pre><code class="">$ cat file<span class="hljs-selector-class">.txt</span>
+<pre><code>$ cat file<span class="hljs-selector-class">.txt</span>
 <span class="hljs-selector-tag">a</span>
 <span class="hljs-selector-tag">b</span>
 c
@@ -11,13 +11,11 @@ c
 $ tac file<span class="hljs-selector-class">.txt</span>
 c
 <span class="hljs-selector-tag">b</span>
-a
-</code></pre><p>Here&#39;s how it works when used with a pipe.</p>
-<pre><code class="">echo <span class="hljs-string">&quot;a<span class="hljs-subst">\n</span>b<span class="hljs-subst">\n</span>c&quot;</span> | tac
+a</code></pre><p>Here&#39;s how it works when used with a pipe.</p>
+<pre><code>echo <span class="hljs-string">&quot;a<span class="hljs-subst">\n</span>b<span class="hljs-subst">\n</span>c&quot;</span> | tac
 c
 b
-a
-</code></pre></div><div id="paginator" class="bottom-box clearfixed"><div class="col-6"><div><a href="/blog/how-to-check-if-app-is-notarized"><<&nbsp;How to check if macOS app is notarized</a></div></div><div class="col-6"><div style="text-align: right"><a href="/blog/how-to-verify-ssh-key-password">How to verify your SSH private key password&nbsp;>></a></div></div></div><div id="subscribe" class="bottom-box"><!-- Begin Sendfox Signup Form -->
+a</code></pre></div><div id="paginator" class="bottom-box clearfixed"><div class="col-6"><div><a href="/blog/how-to-check-if-app-is-notarized"><<&nbsp;How to check if macOS app is notarized</a></div></div><div class="col-6"><div style="text-align: right"><a href="/blog/how-to-verify-ssh-key-password">How to verify your SSH private key password&nbsp;>></a></div></div></div><div id="subscribe" class="bottom-box"><!-- Begin Sendfox Signup Form -->
 <div id="sendfox_embed_signup">
   <h4 class="form_title">Want more of these posts?</h4>
   <p class="form_caption">Subscribe to receive new posts in your inbox.</p>

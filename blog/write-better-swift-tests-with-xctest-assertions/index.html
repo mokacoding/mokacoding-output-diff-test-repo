@@ -12,43 +12,39 @@ Let&#39;s write our own!</p>
 <h2 id="how-to-write-a-custom-xctest-assertion">How to write a custom XCTest assertion</h2>
 <p>If you look under the hood of any XCTest assertion, you&#39;ll see that they are simple functions.
 For example, here&#39;s the signature of <a href="https://developer.apple.com/documentation/xctest/1500984-xctasserttrue"><code>XCTAssertTrue</code></a>:</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">XCTAssertTrue</span><span class="hljs-params">(
-    <span class="hljs-number">_</span> expression: @autoclosure <span class="hljs-params">()</span></span></span> <span class="hljs-keyword">throws</span> -&gt; <span class="hljs-type">Bool</span>,
-    <span class="hljs-number">_</span> message: <span class="hljs-meta">@autoclosure</span> () -&gt; <span class="hljs-type">String</span> = <span class="hljs-string">&quot;&quot;</span>,
-    file: <span class="hljs-type">StaticString</span> = #filePath,
-    line: <span class="hljs-type">UInt</span> = #line
-)
-</code></pre>
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">XCTAssertTrue</span>(
+    <span class="hljs-keyword">_</span> <span class="hljs-params">expression</span>: <span class="hljs-keyword">@autoclosure</span> () <span class="hljs-keyword">throws</span> -&gt; <span class="hljs-type">Bool</span>,
+    <span class="hljs-keyword">_</span> <span class="hljs-params">message</span>: <span class="hljs-keyword">@autoclosure</span> () -&gt; <span class="hljs-type">String</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;&quot;</span>,
+    <span class="hljs-params">file</span>: <span class="hljs-type">StaticString</span> <span class="hljs-operator">=</span> #filePath,
+    <span class="hljs-params">line</span>: <span class="hljs-type">UInt</span> <span class="hljs-operator">=</span> #line
+)</span></code></pre>
 <p>Notice the <code>file</code> and <code>line</code> parameters:
 with their default parameters, they track the assertion call site, so Xcode can add the failure indicator and message in its UI if the test fails.</p>
 <p>Writing a custom assertion means building a function similar to the <code>XCTAssert-</code> ones:
 a function that performs your desired check on its input and reports failures inline using the <code>#filePath</code> and <code>#line</code> parameters.</p>
 <p>Here&#39;s how to build a custom assertion to verify if a <code>Collection</code> type (like <code>Array</code>) is empty.</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">assertEmpty</span>&lt;T&gt;<span class="hljs-params">(
-    <span class="hljs-number">_</span> collection: T,
-    message: <span class="hljs-params">(T)</span></span></span> -&gt; <span class="hljs-type">String</span> = { <span class="hljs-string">&quot;Collection with \($0.count) elements is not empty&quot;</span> },
-    file: <span class="hljs-type">StaticString</span> = #filePath,
-    line: <span class="hljs-type">UInt</span> = #line
-) <span class="hljs-keyword">where</span> <span class="hljs-type">T</span>: <span class="hljs-type">Collection</span> {
-    <span class="hljs-keyword">guard</span> collection.isEmpty == <span class="hljs-literal">false</span> <span class="hljs-keyword">else</span> { <span class="hljs-keyword">return</span> }
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">assertEmpty</span>&lt;<span class="hljs-type">T</span>&gt;(
+    <span class="hljs-keyword">_</span> <span class="hljs-params">collection</span>: <span class="hljs-type">T</span>,
+    <span class="hljs-params">message</span>: (<span class="hljs-type">T</span>) -&gt; <span class="hljs-type">String</span> <span class="hljs-operator">=</span> { <span class="hljs-string">&quot;Collection with <span class="hljs-subst">\(<span class="hljs-variable">$0</span>.count)</span> elements is not empty&quot;</span> },
+    <span class="hljs-params">file</span>: <span class="hljs-type">StaticString</span> <span class="hljs-operator">=</span> #filePath,
+    <span class="hljs-params">line</span>: <span class="hljs-type">UInt</span> <span class="hljs-operator">=</span> #line
+)</span> <span class="hljs-keyword">where</span> <span class="hljs-type">T</span>: <span class="hljs-type">Collection</span> {
+    <span class="hljs-keyword">guard</span> collection.isEmpty <span class="hljs-operator">==</span> <span class="hljs-literal">false</span> <span class="hljs-keyword">else</span> { <span class="hljs-keyword">return</span> }
 
     <span class="hljs-type">XCTFail</span>(message(collection), file: file, line: line)
-}
-</code></pre>
+}</code></pre>
 <p>Let&#39;s unpack what the code does.</p>
 <p><code>func assertEmpty&lt;T&gt;(...) where T: Collection</code> uses a <a href="https://docs.swift.org/swift-book/LanguageGuide/Generics.html#ID186">generic type constraint</a> to tell the compiler it expects a <code>Collection</code> type.</p>
 <p>In the body, we check whether the collection is empty, and if it isn&#39;t, we call the <a href="https://developer.apple.com/documentation/xctest/1500970-xctfail"><code>XCTFail</code></a> XCTest method to make the test fail.</p>
 <p>To <code>XCTFail</code>, we pass the result of calling the <code>message</code> closure and the <code>file</code> and <code>line</code> input parameters.
 All parameters have default values so that consumers can call the custom assertion by passing only the collection value to check.</p>
 <p>Now we can express clearer intention in our tests when we check if a collection is empty:</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">let</span> array = []
-assertEmpty(array)
-</code></pre>
+<pre><code class="hljs swift"><span class="hljs-keyword">let</span> array <span class="hljs-operator">=</span> []
+assertEmpty(array)</code></pre>
 <p>With this custom assertion, we also get a more explicit failure message:</p>
 <p><img src="https://s3.amazonaws.com/mokacoding/2020-12-09-xctfail.jpg" alt="Screenshot of the test failure reported by Xcode: &quot;failed - Collection with 3 elements is not empty&quot;"></p>
 <p>Alternatively, we could have called <a href="https://developer.apple.com/documentation/xctest/1500669-xctassert"><code>XCTAssert</code></a> which &quot;asserts that an expression is true,&quot; making the method a one-liner.</p>
-<pre><code class=" hljs swift"><span class="hljs-type">XCTAssert</span>(collection.isEmpty, message(collection), file: file, line: line)
-</code></pre>
+<pre><code class="hljs swift"><span class="hljs-type">XCTAssert</span>(collection.isEmpty, message(collection), file: file, line: line)</code></pre>
 <p>I prefer calling <code>XCTFail</code> because, with <code>XCTAssert</code>, the failure message would be &quot;<code>XCTAssertTrue</code> failed - ...&quot; which would be confusing to see inline in Xcode as there is no clear relationship between <code>assertEmpty</code> and <code>XCTAssertTrue</code>.</p>
 <p><img src="https://s3.amazonaws.com/mokacoding/2020-12-09-xctassert.jpg" alt="Screenshot of the test failure message when using XCTAssert"></p>
 <p>Custom assertions can also help you to DRY your unit tests by extracting verbose checks.

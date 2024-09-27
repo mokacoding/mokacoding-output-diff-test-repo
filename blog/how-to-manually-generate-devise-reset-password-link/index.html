@@ -6,18 +6,14 @@
 <p>I use Ruby on Rails for my backend, with as little custom logic as possible.
 Naturally, the authentication layer is taken care of by <a href="https://github.com/plataformatec/devise">devise</a>.</p>
 <p>To manually generate a reset password link using devise, the first step is to log in your server and launch the Rails console.</p>
-<pre><code class="">bundle <span class="hljs-built_in">exec</span> rails c
-</code></pre><p>Once in there, ask devise for a new reset password token.
+<pre><code>bundle <span class="hljs-built_in">exec</span> rails c</code></pre><p>Once in there, ask devise for a new reset password token.
 The call returns two values. The first is the raw token to use in the reset password URL query string, and the second is a hashed version of the token.</p>
-<pre><code class="">raw, hashed = <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">Devise</span>.</span></span>token_generator.generate(User, :reset_password_token)
-</code></pre><p>For the reset password to work, you need to associate the token to the user that will use it.</p>
-<pre><code class="">user = <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">User</span>.</span></span>find<span class="hljs-constructor">_by(<span class="hljs-params">email</span>: &#x27;<span class="hljs-params">john</span>.<span class="hljs-params">doe</span>@<span class="hljs-params">mysaas</span>.<span class="hljs-params">com</span>&#x27;)</span>
+<pre><code>raw, hashed = <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">Devise</span>.</span></span>token_generator.generate(User, :reset_password_token)</code></pre><p>For the reset password to work, you need to associate the token to the user that will use it.</p>
+<pre><code>user = <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">User</span>.</span></span>find<span class="hljs-constructor">_by(<span class="hljs-params">email</span>: &#x27;<span class="hljs-params">john</span>.<span class="hljs-params">doe</span>@<span class="hljs-params">mysaas</span>.<span class="hljs-params">com</span>&#x27;)</span>
 user.reset_password_token = hashed
 user.reset_password_sent_at = <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">Time</span>.</span></span>now.utc
-user.save
-</code></pre><p>Finally, you can share the URL. Unless you have customized your routes, it&#39;ll look like this:</p>
-<pre><code class="">https:<span class="hljs-regexp">//my</span>saas.com<span class="hljs-regexp">/users/</span>password/edit?reset_password_token=raw
-</code></pre><p>Full credits for these steps to <a href="https://stackoverflow.com/a/41790443/809944">this StackOverflow answer</a>.</p>
+user.save</code></pre><p>Finally, you can share the URL. Unless you have customized your routes, it&#39;ll look like this:</p>
+<pre><code>https:<span class="hljs-regexp">//my</span>saas.com<span class="hljs-regexp">/users/</span>password/edit?reset_password_token=raw</code></pre><p>Full credits for these steps to <a href="https://stackoverflow.com/a/41790443/809944">this StackOverflow answer</a>.</p>
 </div><div id="paginator" class="bottom-box clearfixed"><div class="col-6"><div><a href="/blog/cocoapods-ci-setup"><<&nbsp;How to use CocoaPods as a CLI tools manager</a></div></div><div class="col-6"><div style="text-align: right"><a href="/blog/midwives-with-the-apple-watch">Midwives with the Apple Watch&nbsp;>></a></div></div></div><div id="subscribe" class="bottom-box"><!-- Begin Sendfox Signup Form -->
 <div id="sendfox_embed_signup">
   <h4 class="form_title">Want more of these posts?</h4>

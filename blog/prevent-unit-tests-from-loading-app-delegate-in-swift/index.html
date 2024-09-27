@@ -4,11 +4,11 @@
 <p><strong>Update 2018/09/19:</strong> Updated to work with Swift 4.2. You can find the previous implementations looking at the history of the <a href="https://github.com/mokacoding/TestAppDelegateExample">demo project</a> on GitHub.</p>
 <p><em>Credits to <a href="http://mr-v.github.io/about/">Witold Skibniewski</a> and <a href="http://qualitycoding.org/app-delegate-for-tests/#comment-61735">Paul Boot</a> who shared the Swift 2.0 implementation in <a href="http://qualitycoding.org/">Jon Reid</a>&#39;s post <a href="http://qualitycoding.org/app-delegate-for-tests/">&quot;How to Easily Switch Your App Delegate for Testing&quot;</a>, and to Jon for wirting the post that started the conversation.</em></p>
 <p>Here&#39;s how to have a dedicated <code>AppDelegate</code> for the unit test target in Swift:</p>
-<pre><code class=" hljs swift"><span class="hljs-comment">// main.swift</span>
+<pre><code class="hljs swift"><span class="hljs-comment">// main.swift</span>
 <span class="hljs-keyword">import</span> UIKit
 
-<span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">delegateClassName</span><span class="hljs-params">()</span></span> -&gt; <span class="hljs-type">String?</span> {
-  <span class="hljs-keyword">return</span> <span class="hljs-type">NSClassFromString</span>(<span class="hljs-string">&quot;XCTestCase&quot;</span>) == <span class="hljs-literal">nil</span> ? <span class="hljs-type">NSStringFromClass</span>(<span class="hljs-type">AppDelegate</span>.<span class="hljs-keyword">self</span>) : <span class="hljs-literal">nil</span>
+<span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">delegateClassName</span>()</span> -&gt; <span class="hljs-type">String</span>? {
+  <span class="hljs-keyword">return</span> <span class="hljs-type">NSClassFromString</span>(<span class="hljs-string">&quot;XCTestCase&quot;</span>) <span class="hljs-operator">==</span> <span class="hljs-literal">nil</span> <span class="hljs-operator">?</span> <span class="hljs-type">NSStringFromClass</span>(<span class="hljs-type">AppDelegate</span>.<span class="hljs-keyword">self</span>) : <span class="hljs-literal">nil</span>
 }
 
 <span class="hljs-type">UIApplicationMain</span>(
@@ -23,8 +23,7 @@
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AppDelegate</span>: <span class="hljs-title">UIResponder</span>, <span class="hljs-title">UIApplicationDelegate</span> </span>{
   <span class="hljs-comment">// ...</span>
-}
-</code></pre>
+}</code></pre>
 <p>Note how we have removed the <code>@UIApplicationMain</code> annotation from the app delegate class definition that Xcode generates for us, as that is now implemented by <code>main.swift</code>.</p>
 <p>You can <a href="https://github.com/mokacoding/TestAppDelegateExample">checkout this example</a> for a full project using this approach.</p>
 <p>I really like how leaner and faster the test target is without having to perform all the initialization code that is done in the normal <code>AppDelegate</code>. I encourage you to adopt this simple approach.</p>

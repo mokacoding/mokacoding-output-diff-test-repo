@@ -5,33 +5,27 @@
 <p>An expression [that] can be replaced with its corresponding value without changing the program&#39;s behavior.</p>
 </blockquote>
 <p>Here&#39;s an example in Swift:</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">rtIncrement</span><span class="hljs-params">(<span class="hljs-number">_</span> number: Int)</span></span> -&gt; <span class="hljs-type">Int</span> {
-    <span class="hljs-keyword">return</span> number + <span class="hljs-number">1</span>
-}
-</code></pre>
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">rtIncrement</span>(<span class="hljs-keyword">_</span> <span class="hljs-params">number</span>: <span class="hljs-type">Int</span>)</span> -&gt; <span class="hljs-type">Int</span> {
+    <span class="hljs-keyword">return</span> number <span class="hljs-operator">+</span> <span class="hljs-number">1</span>
+}</code></pre>
 <p>Functions that are not referentially transparent are referentially opaque.</p>
-<pre><code class=""><span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>
+<pre><code><span class="hljs-keyword">var</span> i <span class="hljs-operator">=</span> <span class="hljs-number">0</span>
 
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">roIncrement</span><span class="hljs-params">(<span class="hljs-number">_</span> number: Int)</span></span> -&gt; <span class="hljs-type">Int</span> {
-    i += <span class="hljs-number">1</span>
-    <span class="hljs-keyword">return</span> number + i
-}
-</code></pre><p>Take these two expressions:</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">let</span> a = rtIncrement(x) + rtIncrement(y) * (rtIncrement(x) - rtIncrement(x))
-<span class="hljs-keyword">let</span> b = rtIncrement(x)
-</code></pre>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">roIncrement</span>(<span class="hljs-keyword">_</span> <span class="hljs-params">number</span>: <span class="hljs-type">Int</span>)</span> -&gt; <span class="hljs-type">Int</span> {
+    i <span class="hljs-operator">+=</span> <span class="hljs-number">1</span>
+    <span class="hljs-keyword">return</span> number <span class="hljs-operator">+</span> i
+}</code></pre><p>Take these two expressions:</p>
+<pre><code class="hljs swift"><span class="hljs-keyword">let</span> a <span class="hljs-operator">=</span> rtIncrement(x) <span class="hljs-operator">+</span> rtIncrement(y) <span class="hljs-operator">*</span> (rtIncrement(x) <span class="hljs-operator">-</span> rtIncrement(x))
+<span class="hljs-keyword">let</span> b <span class="hljs-operator">=</span> rtIncrement(x)</code></pre>
 <p>Referential transparency means that we can replace an invocation of <code>rtIncrement</code> with its value.
 That way, we can simplify <code>a</code> into:</p>
-<pre><code class=" hljs swift">rtIncrement(x) + rtIncrement(y) * <span class="hljs-number">0</span>
-</code></pre>
+<pre><code class="hljs swift">rtIncrement(x) <span class="hljs-operator">+</span> rtIncrement(y) <span class="hljs-operator">*</span> <span class="hljs-number">0</span></code></pre>
 <p>and then into:</p>
-<pre><code class=" hljs swift">rtIncrement(x) + <span class="hljs-number">0</span>
-</code></pre>
+<pre><code class="hljs swift">rtIncrement(x) <span class="hljs-operator">+</span> <span class="hljs-number">0</span></code></pre>
 <p>Because of referential transparency, <code>a == b</code> is true; the two expressions are equivalent.</p>
 <p>The same cannot be said for the referentially opaque counterpart.</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">let</span> a = roIncrement(x) + roIncrement(y) * (roIncrement(x) - roIncrement(x))
-<span class="hljs-keyword">let</span> b = roIncrement(x)
-</code></pre>
+<pre><code class="hljs swift"><span class="hljs-keyword">let</span> a <span class="hljs-operator">=</span> roIncrement(x) <span class="hljs-operator">+</span> roIncrement(y) <span class="hljs-operator">*</span> (roIncrement(x) <span class="hljs-operator">-</span> roIncrement(x))
+<span class="hljs-keyword">let</span> b <span class="hljs-operator">=</span> roIncrement(x)</code></pre>
 <p>Every time <code>roIncrement</code> is called, the global value <code>i</code> changes.
 So, <code>roIncrement(x) - roIncrement(x)</code> is not equal to 0, but -1 (<code>x + i - (x + (i + 1)) = x + i - x - i - 1</code>).</p>
 <p>So what?

@@ -6,27 +6,25 @@
 <li>Legacy code that we need to keep in the source to keep supporting old versions or documentation.</li>
 </ul>
 <p>In such cases we can use Swift&#39;s <code>available</code> declaration attribute to tell the compiler that code using the marked object or function should not compile.</p>
-<pre><code class=" hljs swift"><span class="hljs-comment">// Swift 2.2</span>
-<span class="hljs-meta">@available</span>(&lt;platform&gt;, unavailable=&lt;version&gt;, message=&lt;message&gt;)
+<pre><code class="hljs swift"><span class="hljs-comment">// Swift 2.2</span>
+<span class="hljs-keyword">@available</span>(<span class="hljs-operator">&lt;</span>platform<span class="hljs-operator">&gt;</span>, unavailable<span class="hljs-operator">=&lt;</span>version<span class="hljs-operator">&gt;</span>, message<span class="hljs-operator">=&lt;</span>message<span class="hljs-operator">&gt;</span>)
 
 <span class="hljs-comment">// Swift 3</span>
-<span class="hljs-meta">@available</span>(&lt;platform&gt;, unavailable: &lt;version&gt;, message: &lt;message&gt;)
-</code></pre>
+<span class="hljs-keyword">@available</span>(<span class="hljs-operator">&lt;</span>platform<span class="hljs-operator">&gt;</span>, unavailable: <span class="hljs-operator">&lt;</span>version<span class="hljs-operator">&gt;</span>, message: <span class="hljs-operator">&lt;</span>message<span class="hljs-operator">&gt;</span>)</code></pre>
 <p>For example, if you have to subclass <code>NSObject</code> into something that has a stored constant which needs to be passed at initialization, and don&#39;t want to allow consumers to call <code>init</code> because it doesn&#39;t make sense to set a default value for the constant, you can make <code>init</code> unavailable to its consumers:</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Dummy</span>: <span class="hljs-title">NSObject</span> </span>{
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Dummy</span>: <span class="hljs-title">NSObject</span> </span>{
 
   <span class="hljs-keyword">let</span> foo: <span class="hljs-type">String</span>
 
-  <span class="hljs-keyword">init</span>(foo: <span class="hljs-type">String</span>) {
-    <span class="hljs-keyword">self</span>.foo = foo
+  <span class="hljs-function"><span class="hljs-keyword">init</span>(<span class="hljs-params">foo</span>: <span class="hljs-type">String</span>)</span> {
+    <span class="hljs-keyword">self</span>.foo <span class="hljs-operator">=</span> foo
   }
 
-  <span class="hljs-meta">@available</span>(*, unavailable)
-  <span class="hljs-keyword">override</span> <span class="hljs-keyword">init</span>() {
+  <span class="hljs-keyword">@available</span>(<span class="hljs-operator">*</span>, unavailable)
+  <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">init</span>()</span> {
     <span class="hljs-built_in">fatalError</span>()
   }
-}
-</code></pre>
+}</code></pre>
 <p>Note how the <code>platform</code> parameter has <code>*</code> value, which means <em>any platform</em>, and <code>unavailable</code> has no version value, which means that the methods is unavailable regardless of the current version.</p>
 <p>Unfortunately, as of 2.2, this kind of availability declaration is not converted into an Objective-C attribute, so Objective-C consumers will still see the methods and classes as available.</p>
 <p>If you are reading this and know a way to make Swift code unavailable to both Swift and Objective-C callers, please let me know by leaving a comment below, or getting in touch on Twitter <a href="https://twitter.com/mokagio">@mokagio</a>. Thanks.</p>

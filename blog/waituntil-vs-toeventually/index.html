@@ -1,116 +1,109 @@
 <!DOCTYPE html><html lang="en"><head><title>Nimble: when to use waitUntil or toEventually | mokacoding</title><meta name="description" content="The Nimble matchers framework provides two ways assert expectations on asynchronous code, this post explores when to use one or the other."><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"><!-- Canonical URL--><link rel="canonical" href="https://mokacoding.com/blog/waituntil-vs-toeventually/"><!-- Open Graph meta tags--><meta property="og:title" content="Nimble: when to use waitUntil or toEventually"><meta property="og:description" content="The Nimble matchers framework provides two ways assert expectations on asynchronous code, this post explores when to use one or the other."><meta property="og:url" content="https://mokacoding.com/blog/waituntil-vs-toeventually/"><meta property="og:type" content="article"><meta property="og:site_name" content="mokacoding"><meta property="og:image" content="https://s3.amazonaws.com/mokacoding/mokacoding_og_image.jpg"><!-- Twitter meta tags--><meta property="twitter:card" content="summary"><meta property="twitter:title" content="Nimble: when to use waitUntil or toEventually"><meta property="twitter:site" content="@mokacoding"><meta property="twitter:creator" content="@mokagio"><!-- Stylesheets--><link href="/css/griddy.css" rel="stylesheet"><link href="/css/style.css" rel="stylesheet"><link href="/css/font-awesome.min.css" rel="stylesheet"><link href="/css/zenburn.css" rel="stylesheet"><!-- FavIcon--><!-- Thanks to https://www.favicon-generator.org/ & https://html2jade.org/--><link rel="apple-touch-icon" sizes="57x57" href="https://s3.amazonaws.com/mokacoding/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="https://s3.amazonaws.com/mokacoding/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="https://s3.amazonaws.com/mokacoding/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="https://s3.amazonaws.com/mokacoding/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="https://s3.amazonaws.com/mokacoding/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="https://s3.amazonaws.com/mokacoding/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="https://s3.amazonaws.com/mokacoding/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="https://s3.amazonaws.com/mokacoding/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="https://s3.amazonaws.com/mokacoding/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="https://s3.amazonaws.com/mokacoding/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="https://s3.amazonaws.com/mokacoding/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="https://s3.amazonaws.com/mokacoding/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="https://s3.amazonaws.com/mokacoding/favicon-16x16.png"><link rel="manifest" href="https://s3.amazonaws.com/mokacoding/manifest.json"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="https://s3.amazonaws.com/mokacoding/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><!-- SumoMe--><script src="//load.sumome.com/" data-sumo-site-id="dd80959300db03e20c8bc3dd899f1424fd764d261e6c3c41923c96482a270dba" async="async"></script></head><body><!-- Use this to render an extra header in special occasions--><div class="special-header"><div class="page"><div class="row-12"><div class="col-12"><p><!-- - Saving this for later and to avoid a `git revert`:markdown
   [What is your biggest struggle right now with building software?](https://goo.gl/forms/lCLlJd9hqCUYoTME2)--><p><a href="https://tddinswift.com?utm_source=mokacoding-site&amp;utm_campaign=coming-soon&amp;utm_medium=sticky-header">Avilable Now: <strong>Test-Driven Development in Swift with SwiftUI and Combine</strong></a></p>
 </p></div></div></div></div><div class="page"><div class="row-12"><div class="col-12 header"><h1 class="brand"><a href="/">mokacoding</a></h1><div class="punchline">unit and acceptance testing, automation, productivity</div><div class="links"><a href="/archive.html">Archive</a><a href="/tags.html">Tags</a><a href="https://gio.codes">About</a><a href="#subscribe">Subscribe</a><a href="/feed.xml"><i class="fa fa-rss"></i></a></div></div><div class="col-12"><div class="post-container"><h2 class="post-title"><a href="/blog/waituntil-vs-toeventually">Nimble: when to use waitUntil or toEventually</a></h2><p class="post-meta"><span class="post-date">Fri May 05 2017&nbsp;</span><a href="/tag/Testing/index.html" class="post-tag">-Testing</a><a href="/tag/Nimble/index.html" class="post-tag">-Nimble</a><a href="/tag/Swift/index.html" class="post-tag">-Swift</a></p><div class="post"><p><a href="https://github.com/Quick/Nimble">Nimble</a> provides two ways to assert code that runs asynchronously, <code>toEventually</code> and <code>waitUntil</code>. In this post we  look at them in more details, and understand when to use one or the other.</p>
-<h2 id="-toeventually-"><code>toEventually</code></h2>
+<h2 id="toeventually"><code>toEventually</code></h2>
 <p>You can use <code>toEventually</code> to write expectations that should be tested at some point in the future.</p>
 <p>Its <a href="https://github.com/Quick/Nimble/blob/514358cadbe7012a3e870eb700ec626a486fae52/Sources/Nimble/Matchers/AsyncMatcherWrapper.swift#L111-L117">documentation</a> reads:</p>
 <blockquote>
 <p>Tests the actual value using a matcher to match by checking continuously at each pollInterval until the timeout is reached.</p>
 </blockquote>
 <p>It can be used like:</p>
-<pre><code class=" hljs swift">expect(foo).toEventually(<span class="hljs-built_in">equal</span>(<span class="hljs-string">&quot;something&quot;</span>))
+<pre><code class="hljs swift">expect(foo).toEventually(equal(<span class="hljs-string">&quot;something&quot;</span>))
 
-expect(array).toEventually(beEmpty())
-</code></pre>
+expect(array).toEventually(beEmpty())</code></pre>
 <p><code>toEventually</code> is very nice because it allows us to write expectations that read like english. &quot;<em>Expect value to eventually be this</em>&quot;.</p>
 <p>Having code, whether it is production or test, that reads well makes working in the codebase easy.</p>
-<h2 id="-waituntil-"><code>waitUntil</code></h2>
+<h2 id="waituntil"><code>waitUntil</code></h2>
 <p><code>waitUntil</code> is not a matcher or an expectation, but just an utility function provided by Nimble.</p>
 <p>Its <a href="https://github.com/Quick/Nimble/blob/514358cadbe7012a3e870eb700ec626a486fae52/Sources/Nimble/DSL%2BWait.swift#L89-L96">documentation</a> reads:</p>
 <blockquote>
 <p>Wait asynchronously until the done closure is called or the timeout has been reached.</p>
 </blockquote>
 <p>It can be used like:</p>
-<pre><code class=" hljs swift">waitUntil { done <span class="hljs-keyword">in</span>
+<pre><code class="hljs swift">waitUntil { done <span class="hljs-keyword">in</span>
   service.asynMethodWithCallback { value <span class="hljs-keyword">in</span>
     <span class="hljs-comment">// some expectation(s)</span>
     <span class="hljs-comment">// ...</span>
 
     done()
   }
-}
-</code></pre>
+}</code></pre>
 <p>If <code>done</code> is not called the test will fail, <em>so remember that will ya</em>?</p>
 <h2 id="when-to-use-which">When to use which</h2>
 <p>When testing that a certain condition should be met as a result of the invocation of async code <code>toEventually</code> is your go to API.</p>
 <p>Here&#39;s a more detailed example, which you can find in full <a href="https://github.com/mokacoding/nimble-waitUntil-vs-toEventually">on GitHub</a>.</p>
 <p>Imagine we have an <code>AsyncService</code>, with a method that changes the value of a property on its delegate.</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">protocol</span> <span class="hljs-title">AsyncServiceDelegate</span>: <span class="hljs-title">class</span> </span>{
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">protocol</span> <span class="hljs-title">AsyncServiceDelegate</span>: <span class="hljs-title">class</span> </span>{
   <span class="hljs-keyword">var</span> aProperty: <span class="hljs-type">String</span> { <span class="hljs-keyword">get</span> <span class="hljs-keyword">set</span> }
 }
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AsyncService</span> </span>{
 
-  <span class="hljs-keyword">weak</span> <span class="hljs-keyword">var</span> delegate: <span class="hljs-type">AsyncServiceDelegate?</span>
+  <span class="hljs-keyword">weak</span> <span class="hljs-keyword">var</span> delegate: <span class="hljs-type">AsyncServiceDelegate</span>?
 
-  <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">callThatResultsInSideEffect</span><span class="hljs-params">()</span></span> {
-    <span class="hljs-type">DispatchQueue</span>.global(qos: .background).asyncAfter(deadline: .now() + <span class="hljs-number">0.1</span>) { [<span class="hljs-keyword">weak</span> <span class="hljs-keyword">self</span>] <span class="hljs-keyword">in</span>
-      <span class="hljs-keyword">self</span>?.delegate?.aProperty = <span class="hljs-string">&quot;bazinga&quot;</span>
+  <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">callThatResultsInSideEffect</span>()</span> {
+    <span class="hljs-type">DispatchQueue</span>.global(qos: .background).asyncAfter(deadline: .now() <span class="hljs-operator">+</span> <span class="hljs-number">0.1</span>) { [<span class="hljs-keyword">weak</span> <span class="hljs-keyword">self</span>] <span class="hljs-keyword">in</span>
+      <span class="hljs-keyword">self</span><span class="hljs-operator">?</span>.delegate<span class="hljs-operator">?</span>.aProperty <span class="hljs-operator">=</span> <span class="hljs-string">&quot;bazinga&quot;</span>
     }
   }
-}
-</code></pre>
+}</code></pre>
 <p>A good way to test the implementation of <code>callThatResultsInSideEffect</code> is to create a fake delegate, pass it to the service, call the method, and finally verify that the value <em>eventually</em> matches our expectation.</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FakeDelegate</span>: <span class="hljs-title">AsyncServiceDelegate</span> </span>{
-  <span class="hljs-keyword">var</span> aProperty: <span class="hljs-type">String</span> = <span class="hljs-string">&quot;unset&quot;</span>
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FakeDelegate</span>: <span class="hljs-title">AsyncServiceDelegate</span> </span>{
+  <span class="hljs-keyword">var</span> aProperty: <span class="hljs-type">String</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;unset&quot;</span>
 }
 
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testToEventually</span><span class="hljs-params">()</span></span> {
-    <span class="hljs-keyword">let</span> delegate = <span class="hljs-type">FakeDelegate</span>()
-    <span class="hljs-keyword">let</span> service = <span class="hljs-type">AsyncService</span>()
-    service.delegate = delegate
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testToEventually</span>()</span> {
+    <span class="hljs-keyword">let</span> delegate <span class="hljs-operator">=</span> <span class="hljs-type">FakeDelegate</span>()
+    <span class="hljs-keyword">let</span> service <span class="hljs-operator">=</span> <span class="hljs-type">AsyncService</span>()
+    service.delegate <span class="hljs-operator">=</span> delegate
 
     service.callThatResultsInSideEffect()
 
-    expect(delegate.aProperty).toEventually(<span class="hljs-built_in">equal</span>(<span class="hljs-string">&quot;bazinga&quot;</span>))
-}
-</code></pre>
+    expect(delegate.aProperty).toEventually(equal(<span class="hljs-string">&quot;bazinga&quot;</span>))
+}</code></pre>
 <p>Let&#39;s now add a new asynchronous function to our service. One that takes a callback as input and will call it once the async work is done. For the sake of the example let&#39;s imagine that this async work is fetching a certain <code>String</code>, and the callback receives a <code>Result</code> type (<em>have a look at <a href="https://github.com/antitypical/Result">this library</a> for a proper implementation</em>).</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">extension</span> <span class="hljs-title">AsyncService</span> </span>{
-  <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">doStuff</span><span class="hljs-params">(<span class="hljs-number">_</span> completion: @escaping <span class="hljs-params">(Result&lt;String&gt;)</span></span></span> -&gt; ()) {
-    <span class="hljs-type">DispatchQueue</span>.global(qos: .background).asyncAfter(deadline: .now() + <span class="hljs-number">0.1</span>) {
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">extension</span> <span class="hljs-title">AsyncService</span> </span>{
+  <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">doStuff</span>(<span class="hljs-keyword">_</span> <span class="hljs-params">completion</span>: <span class="hljs-keyword">@escaping</span> (<span class="hljs-type">Result</span>&lt;<span class="hljs-type">String</span>&gt;) -&gt; ())</span> {
+    <span class="hljs-type">DispatchQueue</span>.global(qos: .background).asyncAfter(deadline: .now() <span class="hljs-operator">+</span> <span class="hljs-number">0.1</span>) {
       completion(<span class="hljs-type">Result</span>&lt;<span class="hljs-type">String</span>&gt;.success(<span class="hljs-string">&quot;bazinga&quot;</span>))
     }
   }
-}
-</code></pre>
+}</code></pre>
 <p>To test that <code>doStuff(_ completion:)</code> behaves properly using <code>toEventually</code> we could writing something like:</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testDoStuffWithToEventually</span><span class="hljs-params">()</span></span> {
-  <span class="hljs-keyword">let</span> service = <span class="hljs-type">AsyncService</span>()
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testDoStuffWithToEventually</span>()</span> {
+  <span class="hljs-keyword">let</span> service <span class="hljs-operator">=</span> <span class="hljs-type">AsyncService</span>()
 
-  <span class="hljs-keyword">var</span> callbackValue: <span class="hljs-type">String?</span> = .<span class="hljs-keyword">none</span>
+  <span class="hljs-keyword">var</span> callbackValue: <span class="hljs-type">String</span>? <span class="hljs-operator">=</span> .none
   service.doStuff { result <span class="hljs-keyword">in</span>
     <span class="hljs-keyword">switch</span> result {
-    <span class="hljs-keyword">case</span> .success(<span class="hljs-keyword">let</span> value): callbackValue = value
+    <span class="hljs-keyword">case</span> .success(<span class="hljs-keyword">let</span> value): callbackValue <span class="hljs-operator">=</span> value
     <span class="hljs-keyword">case</span> .error(<span class="hljs-keyword">let</span> error): fail(<span class="hljs-string">&quot;Expected call to doStuff to succeed.&quot;</span>)
     }
   }
 
-  expect(callbackValue).toEventually(<span class="hljs-built_in">equal</span>(<span class="hljs-string">&quot;bazinga&quot;</span>))
-}
-</code></pre>
+  expect(callbackValue).toEventually(equal(<span class="hljs-string">&quot;bazinga&quot;</span>))
+}</code></pre>
 <p>There are two issues with this test.</p>
 <p>The first is that it requires a bit of extra setup, in the form of the variable <code>callbackValue</code>. This is not a big deal, but we should strive to keep our tests as lean as possible.</p>
 <p>In our case the callback has only one parameter, but it is not uncommon to have async callbacks with more than that. For example <code>URLSession</code>&#39;s <a href="https://developer.apple.com/reference/foundation/urlsession/1407613-datatask"><code>dataTask(with:completionHandler:)</code></a> has three.</p>
 <p>Using this technique we might have to define a number of variables to contain the values received by the callback. This extra work makes the test harder to write and maintain.</p>
 <p>The second problem is that the test doesn&#39;t read well. &quot;<em>setup, define a variable, make async call with callback that says to copy the received value, expect copy of received value to eventually equal &#39;bazinga&#39;</em>&quot;.</p>
 <p>In a case like this using <code>waitUntil</code> results in a better test, where with better we mean with less setup needed, and reading closer to natural language.</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testAsyncCallResult</span><span class="hljs-params">()</span></span> {
-  <span class="hljs-keyword">let</span> service = <span class="hljs-type">AsyncService</span>()
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testAsyncCallResult</span>()</span> {
+  <span class="hljs-keyword">let</span> service <span class="hljs-operator">=</span> <span class="hljs-type">AsyncService</span>()
 
   waitUntil { done <span class="hljs-keyword">in</span>
     service.doStuff { result <span class="hljs-keyword">in</span>
       <span class="hljs-keyword">switch</span> result {
       <span class="hljs-keyword">case</span> .success(<span class="hljs-keyword">let</span> value):
-        expect(value) == <span class="hljs-string">&quot;bazinga&quot;</span>
+        expect(value) <span class="hljs-operator">==</span> <span class="hljs-string">&quot;bazinga&quot;</span>
         done()
       <span class="hljs-keyword">case</span> .error:
         fail(<span class="hljs-string">&quot;Expected call to doStuff to suceeded, but it failed&quot;</span>)
       }
     }
   }
-}
-</code></pre>
+}</code></pre>
 <p>This code, while having a bit more indentation, reads better. &quot;<em>setup, wait until async call returns a result, expecting the returned value to equal &#39;bazinga&#39;</em>&quot;. More straightforward and self explanatory, and arguably cleaner than having to copy received values.</p>
 <hr>
 <p>To recap, when the behavior to test is simply the fact that the a value will change as the result of an async call, or that the given callback is actually exectuted, toEventually provides a clean API, that reads like english.</p>

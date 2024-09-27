@@ -14,9 +14,9 @@ so that we can write our tests in a more descriptive way; Nimble brings to the
 table a rich and powerful set of expectations and matchers. Read <a href="https://mokacoding.com/blog/testing-delegates-in-swift-with-xctest/">this post</a>
 if you want to know more.</p>
 <h3 id="testing-callbacks-with-quick-and-nimble">Testing Callbacks with Quick and Nimble</h3>
-<pre><code class=" hljs swift">describe(<span class="hljs-string">&quot;Callback testing&quot;</span>) {
+<pre><code class="hljs swift">describe(<span class="hljs-string">&quot;Callback testing&quot;</span>) {
     it(<span class="hljs-string">&quot;can test callbacks using waitUntil&quot;</span>) {
-        <span class="hljs-keyword">let</span> service = <span class="hljs-type">SomeService</span>()
+        <span class="hljs-keyword">let</span> service <span class="hljs-operator">=</span> <span class="hljs-type">SomeService</span>()
 
         waitUntil { done <span class="hljs-keyword">in</span>
             service.doSomethingAsync { success <span class="hljs-keyword">in</span>
@@ -25,8 +25,7 @@ if you want to know more.</p>
             }
         }
     }
-}
-</code></pre>
+}</code></pre>
 <p>Our method that executes an async operation and receives a closure to run as
 its callback is called from within a <code>waitUntil</code> block.</p>
 <p><code>waitUntil</code> will wait for one second and fail unless the <code>done</code> function
@@ -38,31 +37,29 @@ but in my opinion easier to reason about, and simpler to write.</p>
 <p>This approach can be used to test that a delegate method is called as a result
 of an async operation being executed by its owner.</p>
 <p><strong>Pro tip:</strong> you can configure the duration of the wait interval like this:</p>
-<pre><code class=" hljs swift">waitUntil(timeout: <span class="hljs-number">2</span>) { done <span class="hljs-keyword">in</span>
+<pre><code class="hljs swift">waitUntil(timeout: <span class="hljs-number">2</span>) { done <span class="hljs-keyword">in</span>
     <span class="hljs-comment">// ...</span>
     done()
-}
-</code></pre>
+}</code></pre>
 <h3 id="testing-delegate-properties-setting-with-quick-and-nimble">Testing Delegate Properties Setting with Quick and Nimble</h3>
 <p>Testing this kind of behaviour reveals how neat the Nimble expectations are,
 and how better our test can feel by using this library.</p>
 <p>The example below uses the <em>spy delegate</em> technique introduced in the <a href="https://mokacoding.com/blog/testing-delegates-in-swift-with-xctest/">previous post</a>,
 head over there to read more about it, or checkout the <a href="https://github.com/mokacoding/PracticalTesting">example project</a>
 for this post to see the full code.</p>
-<pre><code class=" hljs swift">describe(<span class="hljs-string">&quot;Delegate testing&quot;</span>) {
+<pre><code class="hljs swift">describe(<span class="hljs-string">&quot;Delegate testing&quot;</span>) {
     context(<span class="hljs-string">&quot;property setting&quot;</span>) {
         it(<span class="hljs-string">&quot;can be tested with toEventually&quot;</span>) {
-            <span class="hljs-keyword">let</span> something = <span class="hljs-type">SomethingWithDelegate</span>()
-            <span class="hljs-keyword">let</span> spyDelegate = <span class="hljs-type">SpyDelegate</span>()
-            something.delegate = spyDelegate
+            <span class="hljs-keyword">let</span> something <span class="hljs-operator">=</span> <span class="hljs-type">SomethingWithDelegate</span>()
+            <span class="hljs-keyword">let</span> spyDelegate <span class="hljs-operator">=</span> <span class="hljs-type">SpyDelegate</span>()
+            something.delegate <span class="hljs-operator">=</span> spyDelegate
 
             something.methodResultingInDelegatePropertySet()
 
-            expect(spyDelegate.property).toEventually(<span class="hljs-built_in">equal</span>(<span class="hljs-number">42</span>))
+            expect(spyDelegate.property).toEventually(equal(<span class="hljs-number">42</span>))
         }
     }
-}
-</code></pre>
+}</code></pre>
 <p>That&#39;s it! <code>toEventually</code> will periodically executes the expectation for a
 configurable interval of time, and fail only if the expectation is not
 fulfilled at the last run.</p>

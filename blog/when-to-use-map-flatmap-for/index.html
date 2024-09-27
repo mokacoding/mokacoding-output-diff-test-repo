@@ -10,42 +10,36 @@
 <p>Why even bother having a <code>for</code> loop construct in the language when you can use <code>map</code>?!</p>
 <p>Once I recovered from my diseased, making arguable coding choices along the way, I realised that <code>map</code> and <code>for</code> deserve the same respect, and serve different purposes. So here&#39;s the rule of thumb on when to use <code>map</code> and when to use <code>for</code>.</p>
 <h2 id="use-map-when-you-need-to-transform-arrays">Use map when you need to transform arrays</h2>
-<pre><code class=" hljs swift"><span class="hljs-keyword">let</span> arrayOfNumbers = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>]
-<span class="hljs-keyword">let</span> arrayOfString = arrayOfNumbers.<span class="hljs-built_in">map</span> { <span class="hljs-string">&quot;\($0)&quot;</span> }
-</code></pre>
+<pre><code class="hljs swift"><span class="hljs-keyword">let</span> arrayOfNumbers <span class="hljs-operator">=</span> [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>]
+<span class="hljs-keyword">let</span> arrayOfString <span class="hljs-operator">=</span> arrayOfNumbers.map { <span class="hljs-string">&quot;<span class="hljs-subst">\(<span class="hljs-variable">$0</span>)</span>&quot;</span> }</code></pre>
 <p>In the context of <code>Array</code> <code>map</code> get an array, applies a transformation function to every element, and returns a new array with the resulting elements. That&#39;s the best use case for map.</p>
 <p>The cool thing about <code>map</code> is how you can chain multiple transformation together and have code that clearly express what it does.</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">let</span> awesomeImages = averageImage
-  .<span class="hljs-built_in">map</span>(cropIntoSquare)
-  .<span class="hljs-built_in">map</span>(bumpContrast)
-  .<span class="hljs-built_in">map</span>(applySecretFilter)
-</code></pre>
-<h2 id="use-for-loops-when-there-are-side-effects-">Use for loops when there are &quot;side effects&quot;</h2>
+<pre><code class="hljs swift"><span class="hljs-keyword">let</span> awesomeImages <span class="hljs-operator">=</span> averageImage
+  .map(cropIntoSquare)
+  .map(bumpContrast)
+  .map(applySecretFilter)</code></pre>
+<h2 id="use-for-loops-when-there-are-side-effects">Use for loops when there are &quot;side effects&quot;</h2>
 <p>Without going <a href="https://en.wikipedia.org/wiki/Side_effect_(computer_science">into details</a> an operation has a <a href="http://programmers.stackexchange.com/questions/40297/what-is-a-side-effect">side effect</a> if it results in some kind of state changing somewhere, for example changing the value of a variable, writing to disk, or updating the UI. In such case using a for loop is more appropriate.</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">for</span> number <span class="hljs-keyword">in</span> arrayOfNumbers {
+<pre><code class="hljs swift"><span class="hljs-keyword">for</span> number <span class="hljs-keyword">in</span> arrayOfNumbers {
   <span class="hljs-built_in">print</span>(number)
-}
-</code></pre>
-<h2 id="and-what-about-flatmap-">And what about flatMap?</h2>
+}</code></pre>
+<h2 id="and-what-about-flatmap">And what about flatMap?</h2>
 <p>Everything said above stand true for <code>flatMap</code> as well.</p>
 <p>When you need to transform the contents of an array of arrays, into a linear array use <code>flatMap</code>:</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">let</span> users: [<span class="hljs-type">User</span>] = ...
-<span class="hljs-keyword">let</span> allEmails = users.flatMap { $<span class="hljs-number">0</span>.emails }
-</code></pre>
+<pre><code class="hljs swift"><span class="hljs-keyword">let</span> users: [<span class="hljs-type">User</span>] <span class="hljs-operator">=</span> <span class="hljs-operator">...</span>
+<span class="hljs-keyword">let</span> allEmails <span class="hljs-operator">=</span> users.flatMap { <span class="hljs-variable">$0</span>.emails }</code></pre>
 <p>When the code needs to perform some action that has side effects use <code>for</code>, and here&#39;s a nice trick to avoid nesting:</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">for</span> element <span class="hljs-keyword">in</span> nestedArray.flatten() {
+<pre><code class="hljs swift"><span class="hljs-keyword">for</span> element <span class="hljs-keyword">in</span> nestedArray.flatten() {
   updateUI(withElement: element)
-}
-</code></pre>
-<h2 id="performances-">Performances?</h2>
+}</code></pre>
+<h2 id="performances">Performances?</h2>
 <p>I run some quick tests and I couldn&#39;t see any relevant performance difference between <code>map</code> and a <code>for</code> loop in Swift. The Swift compiler is probably smart enough to use the best performing loop operation regardless of the code we wrote.</p>
 <hr>
 <p>To recap, here&#39;s my rule of thumb: <strong>if there&#39;s a side effect you probably want to use <code>for</code>, otherwise <code>map</code> seems a better fit</strong></p>
 <p>What is your experience with <code>map</code> vs <code>for</code> loops? Do you agree with me or have a different opinion, if so why? Get in touch on Twitter <a href="http://twitter.com/mokagio">@mokagio</a> or leave a comment below.</p>
 <h2 id="update-foreach">Update: forEach</h2>
 <p><a href="https://twitter.com/RGfox">Richard Fox</a> on Twitter and on the comments below points out that Swift provides a <code>forEach</code> method too. The <code>for</code> loop above could be rewritten as:</p>
-<pre><code class=" hljs swift">arrayOfNumbers.forEach { <span class="hljs-built_in">print</span>($<span class="hljs-number">0</span>) }
-</code></pre>
+<pre><code class="hljs swift">arrayOfNumbers.forEach { <span class="hljs-built_in">print</span>(<span class="hljs-variable">$0</span>) }</code></pre>
 <p>I left out <code>forEach</code> because in my humble opinion the loop version reads better. <em>For element in array do stuff</em> seems better to me than <em>array for each do stuff</em>. Nevertheless <code>forEach</code> is as valid Swift as a <code>for</code> loop. You could rewrite all what we&#39;ve said already using <code>forEach</code> instead of the loop and everything would still stand.</p>
 <p>It is up to you and your team to decide which convention to use, and choose the appropriate construct depending on what you are trying to achieve.</p>
 <p><em>Happy coding, and leave the codebase better than you found it.</em></p>

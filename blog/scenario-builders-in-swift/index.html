@@ -13,7 +13,7 @@ the patient needs to be registered with the doctor issuing the script,
 they both need to be part of the system,
 and the patient needs to be over the minimum age for the drug.</p>
 <p>A traditional unit test would require a setup along these lines:</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">let</span> medicalBackend = <span class="hljs-type">MedicalBackend</span>(
+<pre><code class="hljs swift"><span class="hljs-keyword">let</span> medicalBackend <span class="hljs-operator">=</span> <span class="hljs-type">MedicalBackend</span>(
     name: <span class="hljs-string">&quot;medical backend&quot;</span>,
     registrationID: <span class="hljs-string">&quot;123ABC&quot;</span>,
     address: <span class="hljs-type">Address</span>(
@@ -24,9 +24,9 @@ and the patient needs to be over the minimum age for the drug.</p>
         postCode: <span class="hljs-string">&quot;2ABC&quot;</span>
     )
 )
-<span class="hljs-keyword">let</span> doctor = <span class="hljs-type">Doctor</span>(name: <span class="hljs-string">&quot;a name&quot;</span>, license: <span class="hljs-string">&quot;1234&quot;</span>, specialty: .generalPractitioner)
+<span class="hljs-keyword">let</span> doctor <span class="hljs-operator">=</span> <span class="hljs-type">Doctor</span>(name: <span class="hljs-string">&quot;a name&quot;</span>, license: <span class="hljs-string">&quot;1234&quot;</span>, specialty: .generalPractitioner)
 medicalBackend.employ(doctor: doctor)
-<span class="hljs-keyword">let</span> patient = <span class="hljs-type">Patient</span>(
+<span class="hljs-keyword">let</span> patient <span class="hljs-operator">=</span> <span class="hljs-type">Patient</span>(
     name: <span class="hljs-string">&quot;another name&quot;</span>,
     dateOfBirth: <span class="hljs-type">Date</span>(year: <span class="hljs-number">2010</span>, month: <span class="hljs-number">01</span>, day: <span class="hljs-number">01</span>),
     address: <span class="hljs-type">Address</span>(
@@ -38,74 +38,69 @@ medicalBackend.employ(doctor: doctor)
     )
 )
 medicalBackend.onboard(patient: patient)
-medicalBackend.register(patient: patient, with: doctor)
-</code></pre>
+medicalBackend.register(patient: patient, with: doctor)</code></pre>
 <p><em>The code in this tutorial is available <a href="https://github.com/mokagio/swift-scenario-builder-example">on GitHub</a>. Check it out if you want to follow along from Xcode.</em></p>
 <p>The key information affecting the system under test outcome, that is, whether the patient is under age for the medicine, is lost in the noise made by the rest of the necessary input parameters.</p>
 <p>As already mentioned, <a href="https://mokacoding.com/blog/streamlining-tests-setup-with-fixtures-in-swift/">fixtures</a> can help, but we&#39;re still left with extra work in the arrange phase:</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">let</span> medicalBackend = <span class="hljs-type">MedicalBackend</span>(
+<pre><code class="hljs swift"><span class="hljs-keyword">let</span> medicalBackend <span class="hljs-operator">=</span> <span class="hljs-type">MedicalBackend</span>(
     name: <span class="hljs-string">&quot;medical backend&quot;</span>,
     registrationID: <span class="hljs-string">&quot;123ABC&quot;</span>,
     address: .fixture()
 )
-<span class="hljs-keyword">let</span> doctor = <span class="hljs-type">Doctor</span>.fixture()
+<span class="hljs-keyword">let</span> doctor <span class="hljs-operator">=</span> <span class="hljs-type">Doctor</span>.fixture()
 medicalBackend.employ(doctor: doctor)
-<span class="hljs-keyword">let</span> patient = <span class="hljs-type">Patient</span>.fixture(dateOfBirth: <span class="hljs-type">Date</span>(year: <span class="hljs-number">2010</span>, month: <span class="hljs-number">01</span>, day: <span class="hljs-number">01</span>))
+<span class="hljs-keyword">let</span> patient <span class="hljs-operator">=</span> <span class="hljs-type">Patient</span>.fixture(dateOfBirth: <span class="hljs-type">Date</span>(year: <span class="hljs-number">2010</span>, month: <span class="hljs-number">01</span>, day: <span class="hljs-number">01</span>))
 medicalBackend.onboard(patient: patient)
-medicalBackend.register(patient: patient, with: doctor)
-</code></pre>
+medicalBackend.register(patient: patient, with: doctor)</code></pre>
 <p>Scenario Builders simplify the setup of networks of objects by centralizing all of the instantiation, default values, and linking logic.</p>
 <h2 id="scenario-builder">Scenario Builder</h2>
 <p>A Scenario Builder is an object that lives in your test suite to which you ask to construct a scenario with a natural language-like API.
 It encapsulates all the logic to create and connect the objects that make up the input state.</p>
 <p>Here&#39;s the Scenario Builder for our example:</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ScenarioBuilder</span> </span>{
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ScenarioBuilder</span> </span>{
 
-    <span class="hljs-keyword">private</span> <span class="hljs-keyword">var</span> patientAge: <span class="hljs-type">Int</span> = <span class="hljs-number">30</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">var</span> patientAge: <span class="hljs-type">Int</span> <span class="hljs-operator">=</span> <span class="hljs-number">30</span>
 
-    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">withPatientAge</span><span class="hljs-params">(<span class="hljs-number">_</span> age: Int)</span></span> -&gt; <span class="hljs-type">ScenarioBuilder</span> {
-        <span class="hljs-keyword">var</span> newBuilder = <span class="hljs-keyword">self</span>
-        newBuilder.patientAge = age
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">withPatientAge</span>(<span class="hljs-keyword">_</span> <span class="hljs-params">age</span>: <span class="hljs-type">Int</span>)</span> -&gt; <span class="hljs-type">ScenarioBuilder</span> {
+        <span class="hljs-keyword">var</span> newBuilder <span class="hljs-operator">=</span> <span class="hljs-keyword">self</span>
+        newBuilder.patientAge <span class="hljs-operator">=</span> age
         <span class="hljs-keyword">return</span> newBuilder
     }
 
-    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">build</span><span class="hljs-params">(referenceDate: Date = Date<span class="hljs-params">()</span></span></span>) -&gt; (<span class="hljs-type">MedicalBackend</span>, <span class="hljs-type">Doctor</span>, <span class="hljs-type">Patient</span>) {
-        <span class="hljs-keyword">let</span> medicalBackend = <span class="hljs-type">MedicalBackend</span>(
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">build</span>(<span class="hljs-params">referenceDate</span>: <span class="hljs-type">Date</span> <span class="hljs-operator">=</span> <span class="hljs-type">Date</span>())</span> -&gt; (<span class="hljs-type">MedicalBackend</span>, <span class="hljs-type">Doctor</span>, <span class="hljs-type">Patient</span>) {
+        <span class="hljs-keyword">let</span> medicalBackend <span class="hljs-operator">=</span> <span class="hljs-type">MedicalBackend</span>(
             name: <span class="hljs-string">&quot;a name&quot;</span>,
             registrationID: <span class="hljs-string">&quot;ABC123&quot;</span>,
             address: .fixture()
         )
 
-        <span class="hljs-keyword">let</span> doctor = <span class="hljs-type">Doctor</span>.fixture()
+        <span class="hljs-keyword">let</span> doctor <span class="hljs-operator">=</span> <span class="hljs-type">Doctor</span>.fixture()
 
         medicalBackend.employ(doctor: doctor)
 
-        <span class="hljs-keyword">let</span> dob = <span class="hljs-type">Calendar</span>.current.date(byAdding: .year, value: patientAge, to: referenceDate)!
-        <span class="hljs-keyword">let</span> patient = <span class="hljs-type">Patient</span>.fixture(dateOfBirth: dob)
+        <span class="hljs-keyword">let</span> dob <span class="hljs-operator">=</span> <span class="hljs-type">Calendar</span>.current.date(byAdding: .year, value: patientAge, to: referenceDate)<span class="hljs-operator">!</span>
+        <span class="hljs-keyword">let</span> patient <span class="hljs-operator">=</span> <span class="hljs-type">Patient</span>.fixture(dateOfBirth: dob)
 
         medicalBackend.onboard(patient: patient)
         medicalBackend.register(patient: patient, with: doctor)
 
         <span class="hljs-keyword">return</span> (medicalBackend, doctor, patient)
     }
-}
-</code></pre>
+}</code></pre>
 <p>This pattern is similar to <a href="http://www.natpryce.com/articles/000714.html">Test Data Builders</a> and fixtures, but removes the need for nesting instantiation of dependent objects.</p>
 <p>Thanks to the Scenario Builder, the test we wrote before can become much simpler:</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">let</span> (medicalBackend, doctor, patient) = <span class="hljs-type">ScenarioBuilder</span>().withPatientAge(<span class="hljs-number">10</span>).build()
-</code></pre>
+<pre><code class="hljs swift"><span class="hljs-keyword">let</span> (medicalBackend, doctor, patient) <span class="hljs-operator">=</span> <span class="hljs-type">ScenarioBuilder</span>().withPatientAge(<span class="hljs-number">10</span>).build()</code></pre>
 <p>Notice the signal to noise ratio of this syntax compared to the initial example.
 All the irrelevant information is hidden away inside <code>ScenarioBuilder</code>.</p>
 <p>To appreciate the value of this approach, imagine how much setup work this would spare you if you had to write five, ten, thirty more tests that required a consistent starting state for the medical system.</p>
 <p>A key difference between this approach and extracting the logic in a dedicated function is composability.
 Once you&#39;ve gone through the effort of setting up the Scenario Builder, adding additional variations to the scenario is relatively cheap.</p>
-<pre><code class=" hljs swift"><span class="hljs-type">ScenarioBuilder</span>()
+<pre><code class="hljs swift"><span class="hljs-type">ScenarioBuilder</span>()
   .withPatientAge(<span class="hljs-number">10</span>)
   .withPatientAllergicTo(someActiveIngredient)
   .withPatientWithSpecialCondition(specialCondition)
   .withDoctorNotQualifiedFor(specialCondition)
-  .build()
-</code></pre>
+  .build()</code></pre>
 <p>Scenario Builders are also a way to decouple the tests from the implementation detail of the state instantiation, reducing the maintenance cost.
 Imagine something changes in the method that links a <code>Patient</code> to a <code>Doctor</code>,
 if you manually create and connect patients and doctors in each test,

@@ -14,12 +14,11 @@
 <p>While in the past two year unit testing for iOS and OS X has become better and better, the acceptance testing side of things hasn&#39;t made any improvements.</p>
 <p>To write UI automation test, Apple provides the <a href="https://developer.apple.com/library/mac/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/UsingtheAutomationInstrument/UsingtheAutomationInstrument.html">UIAutomation</a> framework. UIAutomation tests are written in Javascript, and allow us to drive the application UI and make assertion on its state. Despite how promising this all sounds, working with UIAutomation turns out to be quite tedious, and the Javascript APIs not as powerful as the unit testing <em>native</em> counter parts.</p>
 <p>Here&#39;s a snippet of UIAutomation test:</p>
-<pre><code class=" hljs javascript">UIATarget.localTarget().frontMostApp().navigationBar().buttons()[<span class="hljs-string">&quot;Add&quot;</span>].tap();
+<pre><code class="hljs javascript">UIATarget.localTarget().frontMostApp().navigationBar().buttons()[<span class="hljs-string">&quot;Add&quot;</span>].tap();
 
 UIATarget.localTarget().frontMostApp().mainWindow().tableViews()[<span class="hljs-number">0</span>].cells()[<span class="hljs-number">0</span>].elements()[<span class="hljs-string">&quot;Chocolate Cake&quot;</span>];
 
-UIATarget.localTarget().frontMostApp().mainWindow().tableViews()[<span class="hljs-number">0</span>].scrollToElementWithPredicate(<span class="hljs-string">&quot;name beginswith &#x27;Turtle Pie&#x27;&quot;</span>);
-</code></pre>
+UIATarget.localTarget().frontMostApp().mainWindow().tableViews()[<span class="hljs-number">0</span>].scrollToElementWithPredicate(<span class="hljs-string">&quot;name beginswith &#x27;Turtle Pie&#x27;&quot;</span>);</code></pre>
 <p>As you can see they managed to make the Javascript APIs even more verbose than the ones in Foundation. Add to that the fact that these tests need to be run from Instruments and you&#39;ll get the idea of how unpleasant working on this framework could be.</p>
 <p>The last piece of the puzzle is Apple&#39;s answer to the CI question: <a href="https://developer.apple.com/library/ios/documentation/IDEs/Conceptual/xcode_guide-continuous_integration/ConfigureBots.html#//apple_ref/doc/uid/TP40013292-CH9-SW1">Xcode Bots</a>. We can configure an Xcode Bot to get triggered and do work, for example running tests, for us, and host it on an Xcode Server.</p>
 <p>I&#39;ll admit that I haven&#39;t done any work with Xcode Bots, but all the feedbacks I got on theme where on the lines of &quot;I just <strong>doesn&#39;t</strong> work&quot;. 😞</p>
@@ -28,9 +27,9 @@ UIATarget.localTarget().frontMostApp().mainWindow().tableViews()[<span class="hl
 <h2 id="open-source-libraries-for-unit-testing">Open source libraries for Unit Testing</h2>
 <p>The iOS and OS X open source community is full of nice people and interesting projects. At the time of writing <code>pod list</code> reports that <code>8625 pods were found</code>.</p>
 <p>The open source libraries for unit testing show a trend in the <em>style</em> of the tests, they&#39;re in fact all in an xSpec style, which is taken from the <a href="http://rspec.info/">RSpec</a> Ruby testing library, and gives more relevance to the testing the behaviour of a class, rather than enumerating its methods.</p>
-<h3 id="-kiwi-https-github-com-kiwi-bdd-kiwi-"><a href="https://github.com/kiwi-bdd/Kiwi">Kiwi</a></h3>
+<h3 id="kiwi"><a href="https://github.com/kiwi-bdd/Kiwi">Kiwi</a></h3>
 <p><a href="https://github.com/kiwi-bdd/Kiwi">Kiwi</a> is a <em>drop-in</em> full stack replacement for XCTest, that provides an xSpec syntax. A Kiwi test, or better spec, looks like this:</p>
-<pre><code class=" hljs objc">describe(<span class="hljs-string">@&quot;Team&quot;</span>, ^{
+<pre><code class="hljs objc">describe(<span class="hljs-string">@&quot;Team&quot;</span>, ^{
   context(<span class="hljs-string">@&quot;when newly created&quot;</span>, ^{
     it(<span class="hljs-string">@&quot;has a name&quot;</span>, ^{
       <span class="hljs-keyword">id</span> team = [Team team];
@@ -42,15 +41,14 @@ UIATarget.localTarget().frontMostApp().mainWindow().tableViews()[<span class="hl
       [[[team should] have:<span class="hljs-number">11</span>] players];
     });
   });
-});
-</code></pre>
+});</code></pre>
 <p>Kiwi specs are usually easier to read and communicate effectively what the system under test is meant to do, working as good documentation for the code.</p>
 <p>Kiwi comes with it&#39;s own set of <a href="https://github.com/kiwi-bdd/Kiwi/wiki/Expectations">expectations</a>, <a href="https://github.com/kiwi-bdd/Kiwi/wiki/Mocks-and-Stubs#mocks">mocks</a>, and <a href="https://github.com/kiwi-bdd/Kiwi/wiki/Mocks-and-Stubs#stubs">stubs</a>, and even supports <a href="https://github.com/kiwi-bdd/Kiwi/wiki/Asynchronous-Testing">asynchronous testing</a>.</p>
-<h3 id="-specta-https-github-com-specta-specta-"><a href="https://github.com/specta/specta">Specta</a></h3>
+<h3 id="specta"><a href="https://github.com/specta/specta">Specta</a></h3>
 <p><a href="https://github.com/specta/specta">Specta</a> is very similar to Kiwi, but takes a different architectural approach. Where Kiwi is a monolithic drop-in replacement, Specta values modularity and composition. The only thing the library takes care of is the framework for writing and running xSpec style tests, it&#39;s then up to the user to plug in libraries to take care of expectations, matching, mocking and stubbing.</p>
 <p>I personally prefer this approach to library design, little self contained pieces that can be combined together.</p>
 <p>Here&#39;s a Specta spec:</p>
-<pre><code class=" hljs objc">SpecBegin(Thing)
+<pre><code class="hljs objc">SpecBegin(Thing)
 
 describe(<span class="hljs-string">@&quot;Thing&quot;</span>, ^{
   it(<span class="hljs-string">@&quot;should do stuff&quot;</span>, ^{
@@ -63,8 +61,7 @@ describe(<span class="hljs-string">@&quot;Thing&quot;</span>, ^{
       done();
     });
   });
-});
-</code></pre>
+});</code></pre>
 <p>Notice how the implementation on the <code>it</code> blocks is left empty. It&#39;s left to the library&#39;s user to fill them using the tools they prefer.</p>
 <p>Speaking of tools, here&#39;s a list of libraries that can be used with Specta, and Kiwi, for testing:</p>
 <ul>
@@ -75,42 +72,40 @@ describe(<span class="hljs-string">@&quot;Thing&quot;</span>, ^{
 <li><a href="https://github.com/AliSoftware/OHHTTPStubs">OHTTPStubs</a> a library to stub network requests, with block based syntax to match URLs.</li>
 <li><a href="https://github.com/luisobo/Nocilla">Nocilla</a> another library to stub network requests, with a nice chain-able API, <code>stubRequest(@&quot;POST&quot;, &lt;url&gt;).withHeaders(...).withBody(...)</code>.</li>
 </ul>
-<h3 id="-quick-https-github-com-quick-quick-"><a href="https://github.com/Quick/Quick">Quick</a></h3>
+<h3 id="quick"><a href="https://github.com/Quick/Quick">Quick</a></h3>
 <p><a href="https://github.com/Quick/Quick">Quick</a> is the new kid in the block, and it&#39;s a very cool kid indeed. Quick is mainly written in Swift and it&#39;s best suited to write test components written in the new language.</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">import</span> Quick
+<pre><code class="hljs swift"><span class="hljs-keyword">import</span> Quick
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ThingSpec</span>: <span class="hljs-title">QuickSpec</span> </span>{
-  <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">spec</span><span class="hljs-params">()</span></span> {
+  <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">spec</span>()</span> {
     describe(<span class="hljs-string">&quot;a &#x27;Thing&#x27;&quot;</span>) {
       it(<span class="hljs-string">&quot;should do stuff) {
         //
       }
     }
   }
-}</span>
-</code></pre>
+}</span></code></pre>
 <p>Thanks to Swift&#39;s syntax and closures Quick specs look far more readable that Kiwi&#39;s or Specta&#39;s.</p>
 <p>Quick comes together with <a href="https://github.com/Quick/Nimble">Nimble</a> it&#39;s matchers library, which allows us to write neat things like <code>expect(10) &gt; 2</code>.</p>
 <p>Whether is Objective-C or Swift, monolith framework or composition of your favourite libraries, the open source scene offers plenty of valuable testing libraries, specially focused on writing clearer tests thanks to expressive syntax.</p>
 <h2 id="open-source-libraries-for-acceptance-testing">Open source libraries for Acceptance Testing</h2>
 <p>The same discrepancy in the quality of unit versus acceptance testing tools that we see in the Apple frameworks is reflected in the open source tools. This is probably due to the fact that while XCTest provide a solid foundation for developers to build frameworks on top of, UIAutomation doesn&#39;t, and all we&#39;re left with are hacks.</p>
-<h3 id="-kif-https-github-com-kif-framework-kif-"><a href="https://github.com/kif-framework/KIF">KIF</a></h3>
+<h3 id="kif"><a href="https://github.com/kif-framework/KIF">KIF</a></h3>
 <p><a href="https://github.com/kif-framework/KIF">KIF</a>, Keep It Functional, is a framework written in Objective-C that lets us write acceptance tests using XCTest and running them through Xcode in the same way we would do with unit tests.</p>
 <p>The KIF <code>tester</code> uses private APIs to gain knowledge of the view hierarchy, and lets us query and interact with it using the accessibility label value of the views.</p>
-<pre><code class=" hljs objc">- (<span class="hljs-keyword">void</span>)testSuccessfulLogin {
+<pre><code class="hljs objc">- (<span class="hljs-keyword">void</span>)testSuccessfulLogin {
   [tester enterText:<span class="hljs-string">@&quot;user@example.com&quot;</span> intoViewWithAccessibilityLabel:<span class="hljs-string">@&quot;Login User Name&quot;</span>];
   [tester enterText:<span class="hljs-string">@&quot;thisismypassword&quot;</span> intoViewWithAccessibilityLabel:<span class="hljs-string">@&quot;Login Password&quot;</span>];
   [tester tapViewWithAccessibilityLabel:<span class="hljs-string">@&quot;Log In&quot;</span>];
 
   <span class="hljs-comment">// Verify that the login succeeded</span>
   [tester waitForTappableViewWithAccessibilityLabel:<span class="hljs-string">@&quot;Welcome&quot;</span>];
-}
-</code></pre>
+}</code></pre>
 <p><del>A big downside of KIF is the slow response time of the maintainers. This doesn&#39;t want to be a critique though, in the open source world everything is done for free, and since we all need to pay the bills, the amount of time that can be spent on such projects is limited. But when mixed with an foundation hard to work with, this results in unstable tools.</del></p>
 <p><strong>Update 2015/06/04</strong> Since the months right after the publication of this article KIF has seen a remarkable burst in the response time of the maintainers, such that the observation above is not valid any more. Right now KIF is not only the best candidate for UI automation and acceptance testing, but also has an active community, and <a href="https://github.com/kif-framework/KIF/pull/646">new version</a> that will bring architectural and performance improvements is on its way. KIF&#39;s future is definitely bright.</p>
-<h3 id="-subliminal-https-github-com-inkling-subliminal-"><a href="https://github.com/inkling/Subliminal">Subliminal</a></h3>
+<h3 id="subliminal"><a href="https://github.com/inkling/Subliminal">Subliminal</a></h3>
 <p><a href="https://github.com/inkling/Subliminal">Subliminal</a> is an Objective-C framework that, like KIF, integrates with XCTest. Unlike KIF though, Subliminal is written on top of UIAutomation itself, and aims to hide away it&#39;s complexity from the developers.</p>
-<pre><code class=" hljs objc">- (<span class="hljs-keyword">void</span>)testLogInSucceedsWithUsernameAndPassword {
+<pre><code class="hljs objc">- (<span class="hljs-keyword">void</span>)testLogInSucceedsWithUsernameAndPassword {
   SLTextField *usernameField = [SLTextField elementWithAccessibilityLabel:<span class="hljs-string">@&quot;username field&quot;</span>];
   SLTextField *passwordField = [SLTextField elementWithAccessibilityLabel:<span class="hljs-string">@&quot;password field&quot;</span> isSecure:<span class="hljs-literal">YES</span>];
   SLElement *submitButton = [SLElement elementWithAccessibilityLabel:<span class="hljs-string">@&quot;Submit&quot;</span>];
@@ -131,16 +126,15 @@ describe(<span class="hljs-string">@&quot;Thing&quot;</span>, ^{
 
   <span class="hljs-comment">// Check the internal state of the app.</span>
   SLAssertTrue(SLAskAppYesNo(isUserLoggedIn), <span class="hljs-string">@&quot;User is not logged in.&quot;</span>)
-}
-</code></pre>
+}</code></pre>
 <p>Subliminal states that it can enable testing In-App Purchase alerts, and even put the app to sleep. This all sounds great, but the fact that, at the time of writing, the last commit is from September 2014, and there are 13 active PR throws a bad signal on the status of the library 😕.</p>
-<h3 id="-calabash-http-calaba-sh-"><a href="http://calaba.sh/">Calabash</a></h3>
+<h3 id="calabash"><a href="http://calaba.sh/">Calabash</a></h3>
 <p>Of all the tools seen so far <a href="http://calaba.sh/">Calabash</a> is certainly the most original one. It&#39;s a Ruby gem to write acceptance tests in full BDD style using <a href="https://cukes.info/">Cucumber</a>, and it&#39;s maintained by Xamarin, which is a framework for writing iOS and Android apps in C#. What a mix of languages!</p>
 <p>Unlike KIF and Subliminal, Calabash is not integrated with Xcode, at all. My setup for example uses <a href="http://www.vim.org/">Vim</a> and <a href="https://github.com/ruby/rake">Rake</a>.</p>
 <p>We write Cucumber features, implements the step, and run the tests using a command line tool. For this to work we need to embed an HTTP server in the app, that is used by the test runner to query and drive the UI.</p>
 <p>Needless to say, this is all <strong>a big hack</strong>.</p>
 <p>A Cucumber/Calabash test looks like this</p>
-<pre><code class=" hljs ruby"><span class="hljs-comment"># rating_a_stand.feature</span>
+<pre><code class="hljs ruby"><span class="hljs-comment"># rating_a_stand.feature</span>
 
 <span class="hljs-symbol">Feature:</span> Rating a stand
   <span class="hljs-symbol">Scenario:</span> Find <span class="hljs-keyword">and</span> rate a stand from the list
@@ -160,8 +154,7 @@ Given(<span class="hljs-regexp">/^I should see a &quot;([^\&quot;]*)&quot; butto
 
 Given(<span class="hljs-regexp">/^I should not see &quot;([^\&quot;]*)&quot;$/</span>) <span class="hljs-keyword">do</span> <span class="hljs-params">|view_label|</span>
   wait_for_element_does_not_exists <span class="hljs-string">&quot;view marked:&#x27;<span class="hljs-subst">#{view_label}</span>&#x27;
-end</span>
-</code></pre>
+end</span></code></pre>
 <p>The upside of Calabash is very declarative tests, that the management will like <em>if they&#39;ll ever read them</em>, and the ability for a tester to port most of their know-how across the two platforms.</p>
 <p>On the other hand, the toolchain is not very robust. Tests run slower [quote needed], and one needs to constantly swap between Cucumber features, Ruby steps, and Objective-C view code, taking up a considerable amount of time.</p>
 <p>Like the unit testing scene, the open source world provides different choices that can be used to improve your workflow. The only difference here is that the tools are no way near as mature, and the interest of the community is not as active.</p>

@@ -9,7 +9,7 @@
 <p>One of the available actions is <code>install_xcode_plugin</code>, which takes the URL of a zip file containing an Xcode plugin and downloads then install it for you.</p>
 <p>By leveraging this action we can write a sort of <code>rc</code> file with the list of our favourite plugins, and automatically install them on new machines.</p>
 <p>Here&#39;s how <a href="https://github.com/mokagio/dotfiles/blob/master/Fastlane/Fastfile">mine</a> looks like:</p>
-<pre><code class=" hljs ruby">lane <span class="hljs-symbol">:install_xcode_plugins</span> <span class="hljs-keyword">do</span>
+<pre><code class="hljs ruby">lane <span class="hljs-symbol">:install_xcode_plugins</span> <span class="hljs-keyword">do</span>
   [
     <span class="hljs-comment"># The Xcode plugins manager</span>
     <span class="hljs-string">&#x27;https://github.com/alcatraz/Alcatraz/archive/1.1.12.zip&#x27;</span>,
@@ -33,8 +33,7 @@
   .each <span class="hljs-keyword">do</span> <span class="hljs-params">|plugin_url|</span>
     install_xcode_plugin(<span class="hljs-symbol">url:</span> plugin_url)
   <span class="hljs-keyword">end</span>
-<span class="hljs-keyword">end</span>
-</code></pre>
+<span class="hljs-keyword">end</span></code></pre>
 <h2 id="gotchas">Gotchas</h2>
 <p>There are two things to keep in mind when using this workflow. The first is that not all plugins unfortunately have a downloadable zip archive. The second is that there is no version update happening here, the same version is downloaded every time.</p>
 <p>My recommendation is to use this method of installing plugins as the starting point for getting your favourites and Alcatraz itself, then manage them with it.</p>

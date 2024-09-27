@@ -10,9 +10,10 @@
 <li>CI boxes will have to install the dependencies at every run which takes more time, or have caching systems which increases complexity.</li>
 </ul>
 <p>I tweeted in this regard, and <a href="https://twitter.com/tonyarnold">Tony Arnold</a> replied to me suggesting a different approach than usual:</p>
-<p><blockquote class="twitter-tweet" lang="en"><p lang="en" dir="ltr"><a href="https://twitter.com/mokagio">@mokagio</a> <a href="https://twitter.com/jspahrsummers">@jspahrsummers</a> <a href="https://twitter.com/rob_rix">@rob_rix</a> personally, I use carthage with the <code>—no-build</code> option and just integrate the projects directly.</p>&mdash; Tony Arnold (@tonyarnold) <a href="https://twitter.com/tonyarnold/status/637118291585056768">August 28, 2015</a></blockquote>
- <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-<h2 id="-no-build">--no-build</h2>
+<blockquote class="twitter-tweet" lang="en"><p lang="en" dir="ltr"><a href="https://twitter.com/mokagio">@mokagio</a> <a href="https://twitter.com/jspahrsummers">@jspahrsummers</a> <a href="https://twitter.com/rob_rix">@rob_rix</a> personally, I use carthage with the `—no-build` option and just integrate the projects directly.</p>&mdash; Tony Arnold (@tonyarnold) <a href="https://twitter.com/tonyarnold/status/637118291585056768">August 28, 2015</a></blockquote>
+ <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<h2 id="--no-build">--no-build</h2>
 <p>The description of the <code>--no-build</code> option for the <code>update</code> command says, very straightforwardly: skip the building of dependencies after updating. This means that after running <code>carthage update --no-build</code> we won&#39;t have any <code>Carthage/Build</code> folder.</p>
 <p>How to integrate the dependencies then?</p>
 <p>The answer is in Tony&#39;s tweet: just integrate the projects directly 😎. To recap:</p>

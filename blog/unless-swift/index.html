@@ -2,26 +2,23 @@
   [What is your biggest struggle right now with building software?](https://goo.gl/forms/lCLlJd9hqCUYoTME2)--><p><a href="https://tddinswift.com?utm_source=mokacoding-site&amp;utm_campaign=coming-soon&amp;utm_medium=sticky-header">Avilable Now: <strong>Test-Driven Development in Swift with SwiftUI and Combine</strong></a></p>
 </p></div></div></div></div><div class="page"><div class="row-12"><div class="col-12 header"><h1 class="brand"><a href="/">mokacoding</a></h1><div class="punchline">unit and acceptance testing, automation, productivity</div><div class="links"><a href="/archive.html">Archive</a><a href="/tags.html">Tags</a><a href="https://gio.codes">About</a><a href="#subscribe">Subscribe</a><a href="/feed.xml"><i class="fa fa-rss"></i></a></div></div><div class="col-12"><div class="post-container"><h2 class="post-title"><a href="/blog/unless-swift">Unless.swift</a></h2><p class="post-meta"><span class="post-date">Tue Apr 04 2017&nbsp;</span><a href="/tag/Swift/index.html" class="post-tag">-Swift</a><a href="/tag/Espresso/index.html" class="post-tag">-Espresso</a></p><div class="post"><p><a href="https://www.ruby-lang.org/en/">Ruby</a> is a programming language that prides itself of being <a href="http://rubyonrails.org/doctrine/#optimize-for-programmer-happiness">optimized for developer happiness</a>. Part of this optimization is on how close to natural language, or at least natural english, you can get when writing Ruby code.</p>
 <p>One of my favourite features is <code>unless</code>.</p>
-<pre><code class=" hljs ruby"><span class="hljs-keyword">unless</span> condition <span class="hljs-keyword">do</span>
+<pre><code class="hljs ruby"><span class="hljs-keyword">unless</span> condition <span class="hljs-keyword">do</span>
   something()
-<span class="hljs-keyword">end</span>
-</code></pre>
+<span class="hljs-keyword">end</span></code></pre>
 <p>One could be tempted to say that Swift&#39;s <code>guard</code> is the same thing as Ruby&#39;s <code>unless</code>, but that&#39;s not the case.</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">guard</span> condition <span class="hljs-keyword">else</span> {
+<pre><code class="hljs swift"><span class="hljs-keyword">guard</span> condition <span class="hljs-keyword">else</span> {
   something()
   <span class="hljs-keyword">return</span>
-}
-</code></pre>
+}</code></pre>
 <p><code>guard</code> is not simply a <code>if condition == false</code>, but a tool to <strong>enforce early returns</strong>. A <code>guard</code> statement will not compile without a <code>return</code>.</p>
 <p>For this reason I hacked together a Swift version of unless. As you can imagine the code is pretty simple:</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">unless</span><span class="hljs-params">(<span class="hljs-number">_</span> condition: <span class="hljs-params">()</span></span></span> -&gt; <span class="hljs-type">Bool</span>, <span class="hljs-keyword">do</span> closure: @escaping () -&gt; ()) {
-  <span class="hljs-keyword">guard</span> condition() == <span class="hljs-literal">false</span> <span class="hljs-keyword">else</span> {
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">unless</span>(<span class="hljs-keyword">_</span> <span class="hljs-params">condition</span>: () -&gt; <span class="hljs-type">Bool</span>, <span class="hljs-params">do</span> <span class="hljs-params">closure</span>: <span class="hljs-keyword">@escaping</span> () -&gt; ())</span> {
+  <span class="hljs-keyword">guard</span> condition() <span class="hljs-operator">==</span> <span class="hljs-literal">false</span> <span class="hljs-keyword">else</span> {
     <span class="hljs-keyword">return</span>
   }
 
   closure()
-}
-</code></pre>
+}</code></pre>
 <p>You can find the whole code <a href="https://github.com/mokagio/Unless.swift">on GitHub</a>.</p>
 <p>I made it as a Swift Package, but I would advise against using it that way. After all, what&#39;s the point of having syntax sugar that should make your job easier if you have to <code>import</code> it for every file?</p>
 <p>Much better to simply copy the code, <strong>and <a href="https://github.com/mokagio/Unless.swift/blob/master/Tests/UnlessTests/UnlessTests.swift">its tests</a></strong> so that it&#39;s part of your Swift module.</p>

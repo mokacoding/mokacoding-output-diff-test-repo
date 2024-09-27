@@ -6,43 +6,42 @@
 <p>We&#39;ve already seen some techniques to test asynchronous code. Here&#39;s another one useful when...</p>
 <p>Here&#39;s an example, which you can find in full <a href="https://github.com/mokacoding/swift-predicate-block-expectation">on GitHub</a>.</p>
 <p>Say we have a <code>ProductView</code>, and a <code>ProductViewConfigurator</code> service which given a product id fetches its data and configures the view with it.</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ProductView</span>: <span class="hljs-title">UIView</span> </span>{
-  <span class="hljs-keyword">let</span> name: <span class="hljs-type">UILabel</span> = <span class="hljs-type">UILabel</span>()
-  <span class="hljs-keyword">let</span> price: <span class="hljs-type">UILabel</span> = <span class="hljs-type">UILabel</span>()
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ProductView</span>: <span class="hljs-title">UIView</span> </span>{
+  <span class="hljs-keyword">let</span> name: <span class="hljs-type">UILabel</span> <span class="hljs-operator">=</span> <span class="hljs-type">UILabel</span>()
+  <span class="hljs-keyword">let</span> price: <span class="hljs-type">UILabel</span> <span class="hljs-operator">=</span> <span class="hljs-type">UILabel</span>()
 }
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ProductViewConfigurator</span> </span>{
   <span class="hljs-keyword">let</span> view: <span class="hljs-type">ProductView</span>
 
-  <span class="hljs-keyword">init</span>(view: <span class="hljs-type">ProductView</span>) {
-    <span class="hljs-keyword">self</span>.view = view
+  <span class="hljs-function"><span class="hljs-keyword">init</span>(<span class="hljs-params">view</span>: <span class="hljs-type">ProductView</span>)</span> {
+    <span class="hljs-keyword">self</span>.view <span class="hljs-operator">=</span> view
   }
 
-  <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">configure</span><span class="hljs-params">(withProductId id: Int)</span></span> { ... }
-}
-</code></pre>
+  <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">configure</span>(<span class="hljs-params">withProductId</span> <span class="hljs-params">id</span>: <span class="hljs-type">Int</span>)</span> { <span class="hljs-operator">...</span> }
+}</code></pre>
 <p>How can we test that given a know product id the view will be configured with the expected name and price values?</p>
 <p>XCTest provides a method to generate an expectation that will fulfil based on the result of an <a href="https://developer.apple.com/reference/foundation/nspredicate"><code>NSPredicate</code></a>, <a href="https://developer.apple.com/reference/xctest/xctestcase/1500569-expectation"><code>expectation(for:, evaluatedWith:, handler:)</code></a>.</p>
 <p>Add to that the fact that <code>NSPredicate</code> can be <a href="https://developer.apple.com/reference/foundation/nspredicate/1416182-init">initialized with a closure to evaluate</a>, and now you have a recipe for a closure based expectation.</p>
-<pre><code class=" hljs swift"><span class="hljs-comment">// When ProductViewConfigurator configures the view with a given product id</span>
+<pre><code class="hljs swift"><span class="hljs-comment">// When ProductViewConfigurator configures the view with a given product id</span>
 <span class="hljs-comment">// It sets the view name with the name of the fetched product</span>
 <span class="hljs-comment">// It sets the view price with the formatted price of the fetched product</span>
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testItConfiguresTheView</span><span class="hljs-params">()</span></span> {
-  <span class="hljs-keyword">let</span> view = <span class="hljs-type">ProductView</span>()
-  <span class="hljs-keyword">let</span> configurator = <span class="hljs-type">ProductViewConfigurator</span>(view: view)
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testItConfiguresTheView</span>()</span> {
+  <span class="hljs-keyword">let</span> view <span class="hljs-operator">=</span> <span class="hljs-type">ProductView</span>()
+  <span class="hljs-keyword">let</span> configurator <span class="hljs-operator">=</span> <span class="hljs-type">ProductViewConfigurator</span>(view: view)
 
   <span class="hljs-comment">// Create an NSPredicate with a closure describing the test condition</span>
   <span class="hljs-comment">//</span>
-  <span class="hljs-keyword">let</span> predicate = <span class="hljs-type">NSPredicate</span>(block: { any, <span class="hljs-number">_</span> <span class="hljs-keyword">in</span>
+  <span class="hljs-keyword">let</span> predicate <span class="hljs-operator">=</span> <span class="hljs-type">NSPredicate</span>(block: { any, <span class="hljs-keyword">_</span> <span class="hljs-keyword">in</span>
     <span class="hljs-comment">// Note that because the predicate receives an Any as input we need to</span>
     <span class="hljs-comment">// cast it.</span>
-    <span class="hljs-keyword">guard</span> <span class="hljs-keyword">let</span> view = any <span class="hljs-keyword">as</span>? <span class="hljs-type">ProductView</span> <span class="hljs-keyword">else</span> { <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> }
-    <span class="hljs-keyword">return</span> view.name.text == <span class="hljs-string">&quot;Foo&quot;</span> &amp;&amp; view.price.text == <span class="hljs-string">&quot;$42&quot;</span>
+    <span class="hljs-keyword">guard</span> <span class="hljs-keyword">let</span> view <span class="hljs-operator">=</span> any <span class="hljs-keyword">as?</span> <span class="hljs-type">ProductView</span> <span class="hljs-keyword">else</span> { <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> }
+    <span class="hljs-keyword">return</span> view.name.text <span class="hljs-operator">==</span> <span class="hljs-string">&quot;Foo&quot;</span> <span class="hljs-operator">&amp;&amp;</span> view.price.text <span class="hljs-operator">==</span> <span class="hljs-string">&quot;$42&quot;</span>
   })
 
   <span class="hljs-comment">// Create an expectation using the predicate</span>
   <span class="hljs-comment">//</span>
-  <span class="hljs-number">_</span> = <span class="hljs-keyword">self</span>.expectation(<span class="hljs-keyword">for</span>: predicate, evaluatedWith: view, handler: .<span class="hljs-keyword">none</span>)
+  <span class="hljs-keyword">_</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">self</span>.expectation(for: predicate, evaluatedWith: view, handler: .none)
 
   <span class="hljs-comment">// Exercise the system under test</span>
   <span class="hljs-comment">//</span>
@@ -50,9 +49,8 @@
 
   <span class="hljs-comment">// Wait for the expectation to fulfil</span>
   <span class="hljs-comment">//</span>
-  waitForExpectations(timeout: <span class="hljs-number">1</span>, handler: .<span class="hljs-keyword">none</span>)
-}
-</code></pre>
+  waitForExpectations(timeout: <span class="hljs-number">1</span>, handler: .none)
+}</code></pre>
 <p>That&#39;s it. Create a block based <code>NSPredicate</code>, use it as create an <code>XCTestExpectation</code>, exercise the system under test, make the test wait for the expectation to be fulfilled.</p>
 <hr>
 <p>I hope you found this post useful. If you have any question or concern please do get in touch on Twitter <a href="https://twitter.com/mokagio">@mokagio</a>, or leave a comment below.</p>

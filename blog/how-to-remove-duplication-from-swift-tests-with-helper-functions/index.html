@@ -3,103 +3,97 @@
 </p></div></div></div></div><div class="page"><div class="row-12"><div class="col-12 header"><h1 class="brand"><a href="/">mokacoding</a></h1><div class="punchline">unit and acceptance testing, automation, productivity</div><div class="links"><a href="/archive.html">Archive</a><a href="/tags.html">Tags</a><a href="https://gio.codes">About</a><a href="#subscribe">Subscribe</a><a href="/feed.xml"><i class="fa fa-rss"></i></a></div></div><div class="col-12"><div class="post-container"><h2 class="post-title"><a href="/blog/how-to-remove-duplication-from-swift-tests-with-helper-functions">How to remove duplication from Swift tests with helper functions</a></h2><p class="post-meta"><span class="post-date">Tue Nov 06 2018&nbsp;</span><a href="/tag/Testing/index.html" class="post-tag">-Testing</a><a href="/tag/Xcode/index.html" class="post-tag">-Xcode</a><a href="/tag/Swift/index.html" class="post-tag">-Swift</a><a href="/tag/XCTest/index.html" class="post-tag">-XCTest</a></p><div class="post"><p>As your codebase grows so will your test suite. Production code is often refactored to stay simple to work with. The same care should be applied to the test code.</p>
 <p>Your unit test suite should be kept as tidy as your production code. Let&#39;s see how to remove duplication from tests using helper functions.</p>
 <p>Imagine you have a logging component and you want to ensure it logs the expected message for the given inputs to the provided storage layer.</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testLoggerLogsMessageWithPizza</span><span class="hljs-params">()</span></span> {
-  <span class="hljs-keyword">let</span> storageMock = <span class="hljs-type">StorageMock</span>()
-  <span class="hljs-keyword">let</span> logger = <span class="hljs-type">Logger</span>(storage: storageMock())
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testLoggerLogsMessageWithPizza</span>()</span> {
+  <span class="hljs-keyword">let</span> storageMock <span class="hljs-operator">=</span> <span class="hljs-type">StorageMock</span>()
+  <span class="hljs-keyword">let</span> logger <span class="hljs-operator">=</span> <span class="hljs-type">Logger</span>(storage: storageMock())
 
   logger.log(<span class="hljs-type">Pizza</span>())
 
   <span class="hljs-type">XCTAssert</span>(storageMock.hasBeenLogged(<span class="hljs-string">&quot;Pizza is delicious&quot;</span>))
-}
-</code></pre>
+}</code></pre>
 <p><em>This code is also available <a href="https://github.com/mokagio/removing-duplications-in-swift-examples">on GitHub</a>.</em></p>
 <p>Now, let&#39;s say in this system it&#39;s important to ensure the logger behaves as expected with inputs of type <code>Pasta</code>, <code>Gelato</code>, and <code>Cappuccino</code>.</p>
 <p>One way to do it is to duplicate the test for <code>Pizza</code> for each of those inputs.</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testLoggerLogsMessageWithPasta</span><span class="hljs-params">()</span></span> {
-  <span class="hljs-keyword">let</span> storageMock = <span class="hljs-type">StorageMock</span>()
-  <span class="hljs-keyword">let</span> logger = <span class="hljs-type">Logger</span>(storage: storageMock())
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testLoggerLogsMessageWithPasta</span>()</span> {
+  <span class="hljs-keyword">let</span> storageMock <span class="hljs-operator">=</span> <span class="hljs-type">StorageMock</span>()
+  <span class="hljs-keyword">let</span> logger <span class="hljs-operator">=</span> <span class="hljs-type">Logger</span>(storage: storageMock())
 
   logger.log(<span class="hljs-type">Pasta</span>())
 
   <span class="hljs-type">XCTAssert</span>(storageMock.hasBeenLogged(<span class="hljs-string">&quot;There&#x27;s nothing like home made pasta&quot;</span>))
 }
 
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testLoggerLogsMessageWithGelato</span><span class="hljs-params">()</span></span> {
-  <span class="hljs-keyword">let</span> storageMock = <span class="hljs-type">StorageMock</span>()
-  <span class="hljs-keyword">let</span> logger = <span class="hljs-type">Logger</span>(storage: storageMock())
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testLoggerLogsMessageWithGelato</span>()</span> {
+  <span class="hljs-keyword">let</span> storageMock <span class="hljs-operator">=</span> <span class="hljs-type">StorageMock</span>()
+  <span class="hljs-keyword">let</span> logger <span class="hljs-operator">=</span> <span class="hljs-type">Logger</span>(storage: storageMock())
 
   logger.log(<span class="hljs-type">Gelato</span>())
 
   <span class="hljs-type">XCTAssert</span>(storageMock.hasBeenLogged(<span class="hljs-string">&quot;I love gelato any time of the year&quot;</span>))
 }
 
-<span class="hljs-comment">// etc...</span>
-</code></pre>
+<span class="hljs-comment">// etc...</span></code></pre>
 <p>While <a href="https://www.sandimetz.com/blog/2016/1/20/the-wrong-abstraction">there&#39;s nothing bad with a bit of duplication</a> in the case of a mechanical behaviour like this one you could do worst than spending a bit of time to remove those duplicated test code.</p>
 <p>This is worth doing. You&#39;ll end up with code that is easier to read and change in the future. All with little time investment upfront. Bargain!</p>
 <h2 id="extracting-expectation-from-tests">Extracting expectation from tests</h2>
 <p>Have a look at those three tests, you&#39;ll see they all look the same. The only differences are the input of the system under test and its expected behaviour.</p>
 <p>You can extract the test in a function of those parameters:</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">expectLogger</span><span class="hljs-params">(toLog output: String, forInput input: <span class="hljs-keyword">Any</span>)</span></span> {
-  <span class="hljs-keyword">let</span> storageMock = <span class="hljs-type">StorageMock</span>()
-  <span class="hljs-keyword">let</span> logger = <span class="hljs-type">Logger</span>(storage: storageMock())
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">expectLogger</span>(<span class="hljs-params">toLog</span> <span class="hljs-params">output</span>: <span class="hljs-type">String</span>, <span class="hljs-params">forInput</span> <span class="hljs-params">input</span>: <span class="hljs-keyword">Any</span>)</span> {
+  <span class="hljs-keyword">let</span> storageMock <span class="hljs-operator">=</span> <span class="hljs-type">StorageMock</span>()
+  <span class="hljs-keyword">let</span> logger <span class="hljs-operator">=</span> <span class="hljs-type">Logger</span>(storage: storageMock())
 
   logger.log(input)
 
-  <span class="hljs-type">XCTAssert</span>(storageMock.hasStored(output), <span class="hljs-string">&quot;\&quot;\(output)\&quot; was not logged.&quot;</span>)
-}
-</code></pre>
+  <span class="hljs-type">XCTAssert</span>(storageMock.hasStored(output), <span class="hljs-string">&quot;<span class="hljs-subst">\&quot;</span><span class="hljs-subst">\(output)</span><span class="hljs-subst">\&quot;</span> was not logged.&quot;</span>)
+}</code></pre>
 <p>You can then write a single test in which to call the encapsulated expectation for each of the inputs you care about.</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testLoggerLogsMessageBehaviour</span><span class="hljs-params">()</span></span> {
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">testLoggerLogsMessageBehaviour</span>()</span> {
   expectLogger(toLog: <span class="hljs-string">&quot;There&#x27;s nothing like home made pasta&quot;</span>, forInput: <span class="hljs-type">Pasta</span>())
   expectLogger(toLog: <span class="hljs-string">&quot;Pizza is awesome!&quot;</span>, forInput: <span class="hljs-type">Pizza</span>())
   expectLogger(toLog: <span class="hljs-string">&quot;I love gelato any time of the year&quot;</span>, forInput: <span class="hljs-type">Gelato</span>())
   expectLogger(toLog: <span class="hljs-string">&quot;Cappuccino warms and delights me&quot;</span>, forInput: <span class="hljs-type">Cappuccino</span>())
-}
-</code></pre>
+}</code></pre>
 <p>Nice. There&#39;s a little problem though. If the test fails Xcode will show the failure in the expectation function body, not at the call site.</p>
 <p><img src="https://s3.amazonaws.com/mokacoding/2018-11-06-test-helper-inline-failure.png" alt="📸 Screenshot of a test failure reported in the helper function body"></p>
 <p>Even worse if you have more than one failure, it requires you to click on the message to expand it an learn which tests failed.</p>
 <p><img src="https://s3.amazonaws.com/mokacoding/2018-11-06-test-helper-inline-failure-multiple.png" alt="📸 Screenshot of multiple test failures reported in the helper function body"></p>
 <p>When writing unit tests the easier you make failures to be discovered the better off you&#39;ll be.</p>
-<h2 id="accurate-failures-with-file-and-line-">Accurate failures with <code>#file</code> and <code>#line</code></h2>
+<h2 id="accurate-failures-with-file-and-line">Accurate failures with <code>#file</code> and <code>#line</code></h2>
 <p>Not having duplicated code is great, but not knowing which of the <code>expectLogger(toLog:, forInput:)</code> calls failed makes understanding -and eventually fixing- the test failures harder.</p>
 <p>Wouldn&#39;t it be great if the failures were reported at the call site of the test helper method?</p>
 <p>The documentation for the <code>XCTAsser-</code> family of methods shows how to do it. Xcode&#39;s code completion when calling an <code>XCTAssert-</code> method shows this:</p>
 <p><img src="https://s3.amazonaws.com/mokacoding/2018-11-06-xctassert-autocompletion.png" alt="📸 Screenshot of multiple test failures reported in the helper function body"></p>
 <p>There are other two input parameters the functions can accept. They don&#39;t come up in the autocompletion view because they have a default value.</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">XCTAssert</span><span class="hljs-params">(
-  <span class="hljs-number">_</span> expression: @autoclosure <span class="hljs-params">()</span></span></span> <span class="hljs-keyword">throws</span> -&gt; <span class="hljs-type">Bool</span>,
-  <span class="hljs-number">_</span> message: <span class="hljs-meta">@autoclosure</span> () -&gt; <span class="hljs-type">String</span> = <span class="hljs-keyword">default</span>,
-  file: <span class="hljs-type">StaticString</span> = #file,
-  line: <span class="hljs-type">UInt</span> = #line
-)
-</code></pre>
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">XCTAssert</span>(
+  <span class="hljs-keyword">_</span> <span class="hljs-params">expression</span>: <span class="hljs-keyword">@autoclosure</span> () <span class="hljs-keyword">throws</span> -&gt; <span class="hljs-type">Bool</span>,
+  <span class="hljs-keyword">_</span> <span class="hljs-params">message</span>: <span class="hljs-keyword">@autoclosure</span> () -&gt; <span class="hljs-type">String</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">default</span>,
+  <span class="hljs-params">file</span>: <span class="hljs-type">StaticString</span> <span class="hljs-operator">=</span> #file,
+  <span class="hljs-params">line</span>: <span class="hljs-type">UInt</span> <span class="hljs-operator">=</span> #line
+)</span></code></pre>
 <p>The <a href="https://developer.apple.com/documentation/xctest/1500669-xctassert">documentation</a> reads:</p>
 <blockquote>
 <p><strong><code>file</code></strong> The file in which failure occurred. Defaults to the file name of the test case in which this function was called.</p>
 <p><strong><code>line</code></strong> The line number on which failure occurred. Defaults to the line number on which this function was called.</p>
 </blockquote>
 <p>Armed with this knowledge you can pass the call site details to the test helper, so it can relay that information when calling an <code>XCTAssert-</code> or <code>XCTFail</code>.</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">expectLogger</span><span class="hljs-params">(
-  toLog output: String,
-  forInput input: <span class="hljs-keyword">Any</span>,
-  file: StaticString = #file,
-  line: UInt = #line
-)</span></span> {
-  <span class="hljs-keyword">let</span> storageMock = <span class="hljs-type">StorageMock</span>()
-  <span class="hljs-keyword">let</span> logger = <span class="hljs-type">Logger</span>(storage: storageMock)
+<pre><code class="hljs swift"><span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">expectLogger</span>(
+  <span class="hljs-params">toLog</span> <span class="hljs-params">output</span>: <span class="hljs-type">String</span>,
+  <span class="hljs-params">forInput</span> <span class="hljs-params">input</span>: <span class="hljs-keyword">Any</span>,
+  <span class="hljs-params">file</span>: <span class="hljs-type">StaticString</span> <span class="hljs-operator">=</span> #file,
+  <span class="hljs-params">line</span>: <span class="hljs-type">UInt</span> <span class="hljs-operator">=</span> #line
+)</span> {
+  <span class="hljs-keyword">let</span> storageMock <span class="hljs-operator">=</span> <span class="hljs-type">StorageMock</span>()
+  <span class="hljs-keyword">let</span> logger <span class="hljs-operator">=</span> <span class="hljs-type">Logger</span>(storage: storageMock)
 
   logger.log(input)
 
   <span class="hljs-type">XCTAssert</span>(
     storageMock.hasStored(output),
-    <span class="hljs-string">&quot;\&quot;\(output)\&quot; was not logged.&quot;</span>,
+    <span class="hljs-string">&quot;<span class="hljs-subst">\&quot;</span><span class="hljs-subst">\(output)</span><span class="hljs-subst">\&quot;</span> was not logged.&quot;</span>,
     file: file,
     line: line
   )
-}
-</code></pre>
+}</code></pre>
 <p>Now the test failures are reported where <code>expectLogger(toLog:, forInput:)</code> is called. This makes it clearer where to start looking for the issue.</p>
 <p><img src="https://s3.amazonaws.com/mokacoding/2018-11-06-test-helper-failure-in-call-site.png" alt="📸 Screenshot of multiple test failures reported in the helper function body"></p>
 <hr>

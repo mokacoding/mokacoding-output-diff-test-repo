@@ -15,22 +15,20 @@ value which presence is representing in its associated value.</p>
 <p>The <code>Either</code> type represents duality, a value that can either be of a type or
 another.</p>
 <p>This is how we can write <code>Either</code>:</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">enum</span> <span class="hljs-title">Either</span>&lt;<span class="hljs-title">A</span>, <span class="hljs-title">B</span>&gt;</span>{
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">enum</span> <span class="hljs-title">Either</span>&lt;<span class="hljs-title">A</span>, <span class="hljs-title">B</span>&gt;</span>{
   <span class="hljs-keyword">case</span> <span class="hljs-type">Left</span>(<span class="hljs-type">A</span>)
   <span class="hljs-keyword">case</span> <span class="hljs-type">Right</span>(<span class="hljs-type">B</span>)
-}
-</code></pre>
+}</code></pre>
 <p><code>Either</code> allows us to write elegant, self explanatory, and type safe code by
 switching on it:</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">let</span> x: <span class="hljs-type">Either</span>&lt;<span class="hljs-type">SomeType</span>, <span class="hljs-type">AnotherType</span>&gt; = ...
+<pre><code class="hljs swift"><span class="hljs-keyword">let</span> x: <span class="hljs-type">Either</span>&lt;<span class="hljs-type">SomeType</span>, <span class="hljs-type">AnotherType</span>&gt; <span class="hljs-operator">=</span> <span class="hljs-operator">...</span>
 
 <span class="hljs-keyword">switch</span> x {
 <span class="hljs-keyword">case</span> .<span class="hljs-type">Left</span>(<span class="hljs-keyword">let</span> someTypeValue):
   <span class="hljs-comment">// do something with someTypeValue</span>
 <span class="hljs-keyword">case</span> .<span class="hljs-type">Right</span>(<span class="hljs-keyword">let</span> anotherTypeValue):
   <span class="hljs-comment">// do something with anotherTypeValue</span>
-}
-</code></pre>
+}</code></pre>
 <p>Defined like that <code>Either</code> might not seem very practical, but here&#39;s a great
 usage for either: injecting extra cells in a table or collection view.</p>
 <h2 id="injecting-cells-in-a-table-view-using-either">Injecting cells in a table view using Either</h2>
@@ -44,25 +42,24 @@ display from the array of data based on the number of banner cells that we&#39;v
 already displayed.</p>
 <p>Or we could use <code>Either</code>.</p>
 <p>Rather than an array of cell models we could feed the data source an array of <code>Either&lt;CellModel, BannerModel&gt;</code>.</p>
-<pre><code class=" hljs swift"><span class="hljs-keyword">let</span> data: [<span class="hljs-type">Either</span>&lt;<span class="hljs-type">CellModel</span>, <span class="hljs-type">BannerModel</span>&gt;] = ...
+<pre><code class="hljs swift"><span class="hljs-keyword">let</span> data: [<span class="hljs-type">Either</span>&lt;<span class="hljs-type">CellModel</span>, <span class="hljs-type">BannerModel</span>&gt;] <span class="hljs-operator">=</span> <span class="hljs-operator">...</span>
 
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">tableView</span><span class="hljs-params">(<span class="hljs-number">_</span> tableView: UITableView, numberOfRowsInSection section: Int)</span></span> -&gt; <span class="hljs-type">Int</span> {
-  <span class="hljs-keyword">return</span> data.<span class="hljs-built_in">count</span>
-}
-</code></pre>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">tableView</span>(<span class="hljs-keyword">_</span> <span class="hljs-params">tableView</span>: <span class="hljs-type">UITableView</span>, <span class="hljs-params">numberOfRowsInSection</span> <span class="hljs-params">section</span>: <span class="hljs-type">Int</span>)</span> -&gt; <span class="hljs-type">Int</span> {
+  <span class="hljs-keyword">return</span> data.count
+}</code></pre>
 <p>In the <code>tableView(_:cellForRowAt:)</code> method we could then get the item for the
 current index path and simply switch and behave accordingly to its type.</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">tableView</span><span class="hljs-params">(<span class="hljs-number">_</span> tableView: UITableView, cellForRowAt indexPath: IndexPath)</span></span> -&gt; <span class="hljs-type">UITableViewCell</span> {
-    <span class="hljs-keyword">let</span> item = data[indexPath.row]
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">tableView</span>(<span class="hljs-keyword">_</span> <span class="hljs-params">tableView</span>: <span class="hljs-type">UITableView</span>, <span class="hljs-params">cellForRowAt</span> <span class="hljs-params">indexPath</span>: <span class="hljs-type">IndexPath</span>)</span> -&gt; <span class="hljs-type">UITableViewCell</span> {
+    <span class="hljs-keyword">let</span> item <span class="hljs-operator">=</span> data[indexPath.row]
 
-    <span class="hljs-keyword">let</span> identifier: <span class="hljs-type">String</span> = {
+    <span class="hljs-keyword">let</span> identifier: <span class="hljs-type">String</span> <span class="hljs-operator">=</span> {
         <span class="hljs-keyword">switch</span> item {
         <span class="hljs-keyword">case</span> .<span class="hljs-type">Left</span>: <span class="hljs-keyword">return</span> pizzaCellIdentifier
         <span class="hljs-keyword">case</span> .<span class="hljs-type">Right</span>: <span class="hljs-keyword">return</span> adCellIdentifier
         }
     }()
 
-    <span class="hljs-keyword">let</span> cell = tableView.dequeueReusableCell(withIdentifier: identifier, <span class="hljs-keyword">for</span>: indexPath)
+    <span class="hljs-keyword">let</span> cell <span class="hljs-operator">=</span> tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath)
 
     <span class="hljs-keyword">switch</span> item {
     <span class="hljs-keyword">case</span> .<span class="hljs-type">Left</span>(<span class="hljs-keyword">let</span> pizza):
@@ -72,8 +69,7 @@ current index path and simply switch and behave accordingly to its type.</p>
     }
 
     <span class="hljs-keyword">return</span> cell
-}
-</code></pre>
+}</code></pre>
 <p>This approach seems more solid to me. It doesn&#39;t rely on any math, making the
 code easier to digest, and I find the <code>switch-case</code> construct a very elegant
 and self explanatory way to describe behaviour.</p>

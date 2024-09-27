@@ -5,13 +5,13 @@
 Still, the process is straightforward – once you know which files to update.</p>
 <p>You can find the sample project for this tutorial on <a href="https://github.com/mokagio/SwiftUItoUIKit/">GitHub</a>.
 The <a href="https://github.com/mokagio/SwiftUItoUIKit/commits/trunk">commits history</a> shows the diff for each step.</p>
-<h3 id="step-0-extract-root-view-from-swiftui-app-">Step 0 - Extract root view from SwiftUI <code>App</code></h3>
+<h3 id="step-0---extract-root-view-from-swiftui-app">Step 0 - Extract root view from SwiftUI <code>App</code></h3>
 <p>All the layout configuration from your SwiftUI <code>App</code> will be lost once UIKit manages the life cycle.
 Before we begin, extract your current root view in a dedicated <code>View</code>, so you&#39;ll have all your existing UI ready to go after the conversion.</p>
 <p>For example, let&#39;s say your <code>App</code> looks like this:</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ExampleApp</span>: <span class="hljs-title">App</span> </span>{
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ExampleApp</span>: <span class="hljs-title">App</span> </span>{
 
-    <span class="hljs-keyword">var</span> body: some <span class="hljs-type">Scene</span> {
+    <span class="hljs-keyword">var</span> body: <span class="hljs-keyword">some</span> <span class="hljs-type">Scene</span> {
         <span class="hljs-type">WindowGroup</span> {
             <span class="hljs-type">VStack</span>(alignment: .center, spacing: <span class="hljs-number">8</span>) {
                 <span class="hljs-type">Text</span>(<span class="hljs-string">&quot;Lorem&quot;</span>)
@@ -19,12 +19,11 @@ Before we begin, extract your current root view in a dedicated <code>View</code>
             }
         }
     }
-}
-</code></pre>
+}</code></pre>
 <p>To retain all the existing root view SwiftUI, extract the <code>VStack</code> into a dedicated <code>View</code>:</p>
-<pre><code class=" hljs swift"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">RootView</span>: <span class="hljs-title">View</span> </span>{
+<pre><code class="hljs swift"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">RootView</span>: <span class="hljs-title">View</span> </span>{
 
-    <span class="hljs-keyword">var</span> body: some <span class="hljs-type">View</span> {
+    <span class="hljs-keyword">var</span> body: <span class="hljs-keyword">some</span> <span class="hljs-type">View</span> {
         <span class="hljs-type">VStack</span>(alignment: .center, spacing: <span class="hljs-number">8</span>) {
             <span class="hljs-type">Text</span>(<span class="hljs-string">&quot;Lorem&quot;</span>)
             <span class="hljs-type">Text</span>(<span class="hljs-string">&quot;Ipsum&quot;</span>)
@@ -34,70 +33,66 @@ Before we begin, extract your current root view in a dedicated <code>View</code>
 
 <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ExampleApp</span>: <span class="hljs-title">App</span> </span>{
 
-    <span class="hljs-keyword">var</span> body: some <span class="hljs-type">Scene</span> { <span class="hljs-type">WindowGroup</span> { <span class="hljs-type">RootView</span>() } }
-}
-</code></pre>
-<h3 id="step-1-create-a-uiapplicationdelegate-">Step 1 - Create a <code>UIApplicationDelegate</code></h3>
+    <span class="hljs-keyword">var</span> body: <span class="hljs-keyword">some</span> <span class="hljs-type">Scene</span> { <span class="hljs-type">WindowGroup</span> { <span class="hljs-type">RootView</span>() } }
+}</code></pre>
+<h3 id="step-1---create-a-uiapplicationdelegate">Step 1 - Create a <code>UIApplicationDelegate</code></h3>
 <p>If you want to use the UIKit App Delegate life cycle, you&#39;ll need a <code>UIApplicationDelegate</code> to begin with.
 Here&#39;s a template for a minimal one you can use as your starting point:</p>
-<pre><code class=" hljs swift"><span class="hljs-comment">// AppDelegate.swift</span>
+<pre><code class="hljs swift"><span class="hljs-comment">// AppDelegate.swift</span>
 <span class="hljs-keyword">import</span> UIKit
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AppDelegate</span>: <span class="hljs-title">UIResponder</span>, <span class="hljs-title">UIApplicationDelegate</span> </span>{
 
-    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">application</span><span class="hljs-params">(<span class="hljs-number">_</span> application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: <span class="hljs-keyword">Any</span>]?)</span></span> -&gt; <span class="hljs-type">Bool</span> {
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">application</span>(<span class="hljs-keyword">_</span> <span class="hljs-params">application</span>: <span class="hljs-type">UIApplication</span>, <span class="hljs-params">didFinishLaunchingWithOptions</span> <span class="hljs-params">launchOptions</span>: [<span class="hljs-type">UIApplication</span>.<span class="hljs-params">LaunchOptionsKey</span>: <span class="hljs-keyword">Any</span>]<span class="hljs-operator">?</span>)</span> -&gt; <span class="hljs-type">Bool</span> {
         <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>
     }
 
     <span class="hljs-comment">// MARK: - UISceneSession Lifecycle</span>
 
-    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">application</span><span class="hljs-params">(<span class="hljs-number">_</span> application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions)</span></span> -&gt; <span class="hljs-type">UISceneConfiguration</span> {
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">application</span>(<span class="hljs-keyword">_</span> <span class="hljs-params">application</span>: <span class="hljs-type">UIApplication</span>, <span class="hljs-params">configurationForConnecting</span> <span class="hljs-params">connectingSceneSession</span>: <span class="hljs-type">UISceneSession</span>, <span class="hljs-params">options</span>: <span class="hljs-type">UIScene</span>.<span class="hljs-type">ConnectionOptions</span>)</span> -&gt; <span class="hljs-type">UISceneConfiguration</span> {
         <span class="hljs-keyword">return</span> <span class="hljs-type">UISceneConfiguration</span>(name: <span class="hljs-string">&quot;Default Configuration&quot;</span>, sessionRole: connectingSceneSession.role)
     }
-}
-</code></pre>
+}</code></pre>
 <p>If you build your app now, you won&#39;t see any difference because <code>AppDelegate</code> is unused.</p>
-<h3 id="step-2-create-a-uiwindowscenedelegate-">Step 2 - Create a <code>UIWindowSceneDelegate</code></h3>
+<h3 id="step-2---create-a-uiwindowscenedelegate">Step 2 - Create a <code>UIWindowSceneDelegate</code></h3>
 <p>As per <a href="https://developer.apple.com/documentation/uikit/uiwindowscenedelegate">Apple&#39;s documentation</a>, <code>UIWindowSceneDelegate</code> is where you &quot;manage the life cycle of one instance of your app&#39;s user interface&quot; and &quot;receive notifications when its scene connects to the app, enters the foreground, and so on.&quot;
 It&#39;s where you instantiate your UI.</p>
 <p>Here&#39;s a template for a minimal one you can use as your starting point:</p>
-<pre><code class=" hljs swift"><span class="hljs-comment">// SceneDelegate.swift</span>
+<pre><code class="hljs swift"><span class="hljs-comment">// SceneDelegate.swift</span>
 <span class="hljs-keyword">import</span> SwiftUI
 <span class="hljs-keyword">import</span> UIKit
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SceneDelegate</span>: <span class="hljs-title">UIResponder</span>, <span class="hljs-title">UIWindowSceneDelegate</span> </span>{
 
-    <span class="hljs-keyword">var</span> window: <span class="hljs-type">UIWindow?</span>
+    <span class="hljs-keyword">var</span> window: <span class="hljs-type">UIWindow</span>?
 
-    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">scene</span><span class="hljs-params">(<span class="hljs-number">_</span> scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions)</span></span> {
-        <span class="hljs-keyword">guard</span> <span class="hljs-keyword">let</span> windowScene = scene <span class="hljs-keyword">as</span>? <span class="hljs-type">UIWindowScene</span> <span class="hljs-keyword">else</span> { <span class="hljs-keyword">return</span> }
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">scene</span>(<span class="hljs-keyword">_</span> <span class="hljs-params">scene</span>: <span class="hljs-type">UIScene</span>, <span class="hljs-params">willConnectTo</span> <span class="hljs-params">session</span>: <span class="hljs-type">UISceneSession</span>, <span class="hljs-params">options</span> <span class="hljs-params">connectionOptions</span>: <span class="hljs-type">UIScene</span>.<span class="hljs-type">ConnectionOptions</span>)</span> {
+        <span class="hljs-keyword">guard</span> <span class="hljs-keyword">let</span> windowScene <span class="hljs-operator">=</span> scene <span class="hljs-keyword">as?</span> <span class="hljs-type">UIWindowScene</span> <span class="hljs-keyword">else</span> { <span class="hljs-keyword">return</span> }
 
-        <span class="hljs-keyword">let</span> rootView = <span class="hljs-type">RootView</span>()
+        <span class="hljs-keyword">let</span> rootView <span class="hljs-operator">=</span> <span class="hljs-type">RootView</span>()
 
-        <span class="hljs-keyword">let</span> window = <span class="hljs-type">UIWindow</span>(windowScene: windowScene)
-        window.rootViewController = <span class="hljs-type">UIHostingController</span>(rootView: rootView)
-        <span class="hljs-keyword">self</span>.window = window
+        <span class="hljs-keyword">let</span> window <span class="hljs-operator">=</span> <span class="hljs-type">UIWindow</span>(windowScene: windowScene)
+        window.rootViewController <span class="hljs-operator">=</span> <span class="hljs-type">UIHostingController</span>(rootView: rootView)
+        <span class="hljs-keyword">self</span>.window <span class="hljs-operator">=</span> window
         window.makeKeyAndVisible()
     }
-}
-</code></pre>
+}</code></pre>
 <p>Like <code>AppDelegate</code>, this code is currently unused.
 We&#39;ll take care of this in the next step.</p>
-<h3 id="step-3-update-info-plist-uiapplicationscenemanifest-main-">Step 3 - Update <code>Info.plist</code> <code>UIApplicationSceneManifest</code> &amp; <code>@main</code></h3>
+<h3 id="step-3---update-infoplist-uiapplicationscenemanifest--main">Step 3 - Update <code>Info.plist</code> <code>UIApplicationSceneManifest</code> &amp; <code>@main</code></h3>
 <p>With a <code>UIApplicationDelegate</code> and <code>UIWindowSceneDelegate</code> in place, it&#39;s finally time to tell Xcode to use them for the app&#39;s life cycle.</p>
 <p>Got in your app target &quot;Info&quot; section and update the &quot;Application Scene Manifest&quot; from this:</p>
 <p><img src="https://s3.amazonaws.com/mokacoding/2021-01-21-info-plist-before.jpg" alt="screenshot of Application Scene Manifest for SwiftUI life cycle app"></p>
 <p>To this:</p>
 <p><img src="https://s3.amazonaws.com/mokacoding/2021-01-21-info-plist-after.jpg" alt="screenshot of Application Scene Manifest for UIKit App Delegate life cycle app"></p>
 <p>If you&#39;re like me and like to work with text files instead of GUIs, you can edit the <code>Info.plist</code> directly. From this:</p>
-<pre><code class=" hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">key</span>&gt;</span>UIApplicationSceneManifest<span class="hljs-tag">&lt;/<span class="hljs-name">key</span>&gt;</span>
+<pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">key</span>&gt;</span>UIApplicationSceneManifest<span class="hljs-tag">&lt;/<span class="hljs-name">key</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">dict</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">key</span>&gt;</span>UIApplicationSupportsMultipleScenes<span class="hljs-tag">&lt;/<span class="hljs-name">key</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">true</span>/&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">dict</span>&gt;</span>
-</code></pre>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dict</span>&gt;</span></code></pre>
 <p>To this:</p>
-<pre><code class=" hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">key</span>&gt;</span>UIApplicationSceneManifest<span class="hljs-tag">&lt;/<span class="hljs-name">key</span>&gt;</span>
+<pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">key</span>&gt;</span>UIApplicationSceneManifest<span class="hljs-tag">&lt;/<span class="hljs-name">key</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">dict</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">key</span>&gt;</span>UIApplicationSupportsMultipleScenes<span class="hljs-tag">&lt;/<span class="hljs-name">key</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">false</span>/&gt;</span>
@@ -113,18 +108,16 @@ We&#39;ll take care of this in the next step.</p>
       <span class="hljs-tag">&lt;/<span class="hljs-name">dict</span>&gt;</span>
     <span class="hljs-tag">&lt;/<span class="hljs-name">array</span>&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-name">dict</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">dict</span>&gt;</span>
-</code></pre>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dict</span>&gt;</span></code></pre>
 <p>Updating the <code>Info.plist</code> will get the OS to load the correct object at runtime, but the app is still configured to use the SwiftUI <code>App</code> implementation as the main entry point.</p>
 <p>You can make your new <code>AppDelegate</code> the app&#39;s entry point by moving the <code>@main</code> annotation to it.</p>
-<pre><code class=" hljs swift"><span class="hljs-comment">// AppDelegate.swift</span>
+<pre><code class="hljs swift"><span class="hljs-comment">// AppDelegate.swift</span>
 <span class="hljs-keyword">import</span> UIKit
 
-@main
+<span class="hljs-keyword">@main</span>
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AppDelegate</span>: <span class="hljs-title">UIResponder</span>, <span class="hljs-title">UIApplicationDelegate</span> </span>{
     <span class="hljs-comment">// ...</span>
-}
-</code></pre>
+}</code></pre>
 <p>That&#39;s it.</p>
 <p>To verify the setup works, add a breakpoint to <code>application(_:, didFinishLaunchingWithOptions:)</code> or <code>scene(_:, willConnectTo:, options:)</code> and launch the app, the execution should pause there.</p>
 <p>Enjoy your UIKit App Delegate life cycle.</p>

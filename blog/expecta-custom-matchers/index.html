@@ -13,32 +13,27 @@
 <p>The first step is creating an <code>EXPMatchers</code> category named after the new matcher: <code>EXPMatchers+beAFruit</code>.</p>
 <p>We are now going to look at the code step by step, you can always check the example repo to see the entire <a href="https://github.com/mokacoding/expecta-plugin-example/blob/6f18f0ea17976e376fa55feea2006bb52b3671dd/expecta-plugins-exampleTests/EXPMatchers%2BbeAFruit.h">header</a> and <a href="https://github.com/mokacoding/expecta-plugin-example/blob/6f18f0ea17976e376fa55feea2006bb52b3671dd/expecta-plugins-exampleTests/EXPMatchers%2BbeAFruit.m">implementation</a>.</p>
 <p>In the <code>.h</code> we&#39;ll define the signature of our matcher using the <code>EXPMatcherInterface</code> macro, which expects the matcher name and a list of arguments.</p>
-<pre><code class=" hljs objc"><span class="hljs-meta">#import <span class="hljs-meta-string">&quot;Expecta.h&quot;</span></span>
+<pre><code class="hljs objc"><span class="hljs-meta">#import <span class="hljs-meta-string">&quot;Expecta.h&quot;</span></span>
 
-EXPMatcherInterface(beAFruit, (<span class="hljs-keyword">void</span>))
-</code></pre>
+EXPMatcherInterface(beAFruit, (<span class="hljs-keyword">void</span>))</code></pre>
 <p>Notice the <code>(void)</code> as the second argument to state that our matcher is not using any parameters.</p>
 <p>Than we are going to write the matcher&#39;s implementation, by providing code to run for the blocks making up the matcher.</p>
-<pre><code class=" hljs objc"><span class="hljs-meta">#import <span class="hljs-meta-string">&quot;EXPMatchers+beAFruit.h&quot;</span></span>
+<pre><code class="hljs objc"><span class="hljs-meta">#import <span class="hljs-meta-string">&quot;EXPMatchers+beAFruit.h&quot;</span></span>
 <span class="hljs-meta">#import <span class="hljs-meta-string">&quot;Fruit.h&quot;</span></span>
 
-EXPMatcherImplementationBegin(beAFruit, (<span class="hljs-keyword">void</span>)) {
-</code></pre>
+EXPMatcherImplementationBegin(beAFruit, (<span class="hljs-keyword">void</span>)) {</code></pre>
 <p>The matcher has access to the object in the <code>expect( )</code> through <code>actual</code>. Since we&#39;re going to need to check for it&#39;s <code>nil</code> state more than once in the implementation we should put that value in a variable.</p>
-<pre><code class=" hljs objc">  <span class="hljs-built_in">BOOL</span> actualIsNil = actual == <span class="hljs-literal">nil</span>;
-</code></pre>
+<pre><code class="hljs objc">  <span class="hljs-built_in">BOOL</span> actualIsNil = actual == <span class="hljs-literal">nil</span>;</code></pre>
 <p>The first block to implement is <code>prerequisite</code>, this can be used to perform pre-checks and make the test fail. In the library&#39;s <a href="https://github.com/specta/expecta/blob/master/Expecta/Matchers/EXPMatchers+beCloseTo.m#L5"><code>beCloseTo</code></a> if <code>actual</code> is not an <code>NSNumber</code> there is no point in comparing it, so the test can fail already. In our case if <code>actual</code> is nil the is certainly not a <code>Fruit</code>, so we can fail straightaway.</p>
-<pre><code class=" hljs objc">  prerequisite(^<span class="hljs-built_in">BOOL</span> {
+<pre><code class="hljs objc">  prerequisite(^<span class="hljs-built_in">BOOL</span> {
     <span class="hljs-keyword">return</span> !actualIsNil;
-  });
-</code></pre>
+  });</code></pre>
 <p>Then there is <code>match</code>, which is where we can perform all the logic to determine whether our expectation is met.</p>
-<pre><code class=" hljs objc">  match(^<span class="hljs-built_in">BOOL</span> {
+<pre><code class="hljs objc">  match(^<span class="hljs-built_in">BOOL</span> {
     <span class="hljs-keyword">return</span> [actual isKindOfClass:[Fruit <span class="hljs-keyword">class</span>]];
-  });
-</code></pre>
+  });</code></pre>
 <p>Finally there are two blocks that print the error message for the normal and negated (<code>.toNot</code>) failure scenarios.</p>
-<pre><code class=" hljs objc">  failureMessageForTo(^<span class="hljs-built_in">NSString</span> * {
+<pre><code class="hljs objc">  failureMessageForTo(^<span class="hljs-built_in">NSString</span> * {
     <span class="hljs-keyword">if</span> (actualIsNil) {
       <span class="hljs-keyword">return</span> <span class="hljs-string">@&quot;the actual value in nil/null&quot;</span>;
     }
@@ -52,15 +47,12 @@ EXPMatcherImplementationBegin(beAFruit, (<span class="hljs-keyword">void</span>)
     }
 
     <span class="hljs-keyword">return</span> [<span class="hljs-built_in">NSString</span> stringWithFormat:<span class="hljs-string">@&quot;expected: not kind of %@, got: an instance of %@&quot;</span>, [Fruit <span class="hljs-keyword">class</span>], [actual <span class="hljs-keyword">class</span>]];
-  });
-</code></pre>
+  });</code></pre>
 <p>The last thing left to do is do declare that the implementation is finished.</p>
-<pre><code class=" hljs objc">EXPMatcherImplementationEnd
-</code></pre>
+<pre><code class="hljs objc">EXPMatcherImplementationEnd</code></pre>
 <p>You can see <code>beAFruit</code> implementation all in one file, as well as it&#39;s usage in a test case, in the <a href="https://github.com/mokacoding/expecta-plugin-example">example repo</a>.</p>
 <p>In case you want to write a matcher that uses an argument, like <code>expect(@42).to.beLessThan(@100)</code>, you can specify it in the matcher interface and implementation definition blocks like this:</p>
-<pre><code class=" hljs objc">EXPMatcherInterface(beLessThan, (<span class="hljs-keyword">id</span> expected));
-</code></pre>
+<pre><code class="hljs objc">EXPMatcherInterface(beLessThan, (<span class="hljs-keyword">id</span> expected));</code></pre>
 <p>Note that <code>expected</code> is the naming convention used by all the matcher in the library, so you should use it too.</p>
 <h3 id="custom-matchers-in-the-wild">Custom matchers in the wild</h3>
 <p>So nice people in the open source community have already written some custom matchers for Expecta. The most interesting ones are:</p>

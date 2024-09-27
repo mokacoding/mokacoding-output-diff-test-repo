@@ -14,12 +14,11 @@ Before discovering the eunuch plugin, I used NERDTree to rename files.</p>
 <li><code>m</code> to open the NERDTree menu</li>
 <li><code>m</code> to move the node</li>
 </ul>
-<h2 id="vanilla-vim-shell-out-to-mv-">Vanilla Vim: shell out to <code>mv</code></h2>
+<h2 id="vanilla-vim-shell-out-to-mv">Vanilla Vim: shell out to <code>mv</code></h2>
 <p>If you are not keep on plugin, you can still trust vanilla Vim to get the job done for you.</p>
 <p>In Vim, you can execute commands in your shell without opening a new terminal with <a href="http://vimdoc.sourceforge.net/htmldoc/various.html#:!cmd"><code>:!cmd</code></a>.
 To rename a file, you&#39;ll want to execute <code>mv</code>:</p>
-<pre><code class="">:<span class="hljs-title">!mv</span> source <span class="hljs-keyword">target</span>
-</code></pre><p>The caveat with this approach that if you rename the file in the current buffer, it won&#39;t be available anymore and Vim will give you an error.
+<pre><code>:<span class="hljs-title">!mv</span> source <span class="hljs-keyword">target</span></code></pre><p>The caveat with this approach that if you rename the file in the current buffer, it won&#39;t be available anymore and Vim will give you an error.
 You&#39;ll have to reload it from its new location to keep working on it.</p>
 <hr>
 <p>Which approach do you prefer?

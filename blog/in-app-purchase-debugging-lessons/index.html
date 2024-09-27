@@ -4,7 +4,8 @@
 <h3 id="never-ever-quit-the-app-while-the-purchase-is-in-progress">Never ever quit the app while the purchase is in progress</h3>
 <p>Let me say it again: <strong>never ever quit your app while a purchase is in progress</strong>.</p>
 <p>If you do, you&#39;ll see this alert popping up every time, regardless of what you do:</p>
-<p><img src="http://mokacoding.s3.amazonaws.com/2014-08-26-iap-already-purchased-hasnt-been-downloaded.png" alt="Item has already been purchased but it hasn't been downloaded error screenshot"/></p>
+<img src="http://mokacoding.s3.amazonaws.com/2014-08-26-iap-already-purchased-hasnt-been-downloaded.png" alt="Item has already been purchased but it hasn't been downloaded error screenshot"/>
+
 <p>Picking from the <a href="https://developer.apple.com/library/ios/technotes/tn2259/_index.html#//apple_ref/doc/uid/DTS40009578-CH1-FREQUENTLY_ASKED_QUESTIONS">In-App Purchase FAQ</a>: <em>&quot;You are getting the &quot;You&#39;ve already purchased this In-App Purchase but it hasn&#39;t been downloaded.&quot; error message because you did not call <code>SKPaymentQueue</code>&#39;s <code>finishTransaction:</code> method in your application. &quot;</em></p>
 <p>Looking through the <a href="https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/StoreKitGuide/Chapters/DeliverProduct.html">In-App Purchase Programming Guide</a> we discover that not finishing a transaction is a problem, because:</p>
 <blockquote>
@@ -17,7 +18,8 @@
 <p>Even more important is <strong>logging the reason a transaction has failed</strong>. </p>
 <p><a href="https://developer.apple.com/library/ios/documentation/StoreKit/Reference/SKPaymentTransaction_Class/Reference/Reference.html"><code>SKPaymentTransaction</code></a> has an <a href="https://developer.apple.com/library/ios/documentation/StoreKit/Reference/SKPaymentTransaction_Class/Reference/Reference.html#//apple_ref/occ/instp/SKPaymentTransaction/error"><code>error</code></a> property which is <em>&quot;an object describing the error that occurred while processing the transaction&quot;</em>.</p>
 <h3 id="test-with-a-good-connection">Test with a good connection</h3>
-<p><img src="http://mokacoding.s3.amazonaws.com/2014-08-26-iap-cannot-connect-store.png" alt="Cannot connect to iTunes Store error screenshot"/></p>
+<img src="http://mokacoding.s3.amazonaws.com/2014-08-26-iap-cannot-connect-store.png" alt="Cannot connect to iTunes Store error screenshot"/>
+
 <p>Thanks to the <code>error</code> property above I once found out that the failure I&#39;d been experiencing for the past 10 minutes were due to the fact that the app wasn&#39;t able to connect to the iTunes Store because of the crappy Wi-Fi I was using.</p>
 <hr>
 <p>iOS 8 brought the possibility of testing IAP on the Simulator. I hope Apple will soon improve the IAP test accounts, giving developers the possibility to reset and remove transactions.</p>

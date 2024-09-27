@@ -38,12 +38,11 @@ These configurations are buried in the scheme settings; it&#39;s far too easy to
 You might disable some tests and accidentally check-in the change to the scheme, and suddenly find yourself missing an important part of your unit tests suite.</p>
 <h2 id="from-the-terminal">From the terminal</h2>
 <p>If you are running your tests from the terminal, you can use the <code>-only-testing</code> <code>xcodebuild</code> flag to run a subset of tests.</p>
-<pre><code class="">xcodebuild test \
+<pre><code>xcodebuild test \
   -<span class="ruby">scheme YourScheme \
 </span>  -<span class="ruby">project YourProject.xcodeproj \
 </span>  -<span class="ruby">destination <span class="hljs-string">&#x27;platform=iOS Simulator,name=iPhone Xs&#x27;</span> \
-</span>  -<span class="ruby">only-testing YourTests/YourClassTests/testSomething</span>
-</code></pre><p>You can add as many <code>-only-testing</code> as you want.</p>
+</span>  -<span class="ruby">only-testing YourTests/YourClassTests/testSomething</span></code></pre><p>You can add as many <code>-only-testing</code> as you want.</p>
 <p>The option supports different granularities of identifiers: <code>TestTarget[/TestClass[/TestMethod]]</code>.
 This means that in the example above you can run all the tests in <code>YourClassTests</code> by using <code>-only-testing YourTests/YourClassTests</code>.</p>
 <p>Worth noting that you can also run all the tests other than a subset, using the <code>-skip-testing</code> option instead.</p>
@@ -51,14 +50,13 @@ This means that in the example above you can run all the tests in <code>YourClas
 <p>If you are using the testing framework <a href="https://github.com/Quick/Quick">Quick</a> to enjoy a more descriptive way of defining your tests you might notice that Xcode doesn&#39;t add the diamonds in the gutter.</p>
 <p>You can still run a subset of tests by <a href="https://github.com/Quick/Quick/blob/0b4ed6c706dd0cce923b5019a605a9bcc6b1b600/Documentation/en-us/QuickExamplesAndGroups.md#temporarily-running-a-subset-of-focused-examples"><em>focusing</em></a> them.
 This can be done by adding an <code>f</code> in front of on an example or group: <code>fit</code>, <code>fcontext</code>, <code>fdescribe</code>.</p>
-<pre><code class=" hljs swift">fit(<span class="hljs-string">&quot;is loud&quot;</span>) {
+<pre><code class="hljs swift">fit(<span class="hljs-string">&quot;is loud&quot;</span>) {
   <span class="hljs-comment">// ...only this focused example will be run.</span>
 }
 
 it(<span class="hljs-string">&quot;has a high frequency&quot;</span>) {
   <span class="hljs-comment">// ...this example is not focused, and will not be run.</span>
-}
-</code></pre>
+}</code></pre>
 <h2 id="a-word-of-caution">A word of caution</h2>
 <p>Running one test or a subset of tests will make your feedback loop faster, but will also reduce the confidence in your change not breaking any part of the codebase.</p>
 <p>My recommendation is to run the subset of tests for the code you are working on only during the intermediate steps of development.

@@ -7,12 +7,12 @@
 <p>You can see or the original web version <a href="http://mokagio.github.io/acceptance-tests-cocoaheads-talk/#/">here</a>. The video should come out, eventually.</p>
 <h2 id="before-we-begin">Before we begin</h2>
 <p>Before we start talking about acceptance testing there are two things that need to be made clear.</p>
-<h3 id="acceptance-test-unit-test">Acceptance test != Unit test</h3>
+<h3 id="acceptance-test--unit-test">Acceptance test != Unit test</h3>
 <p>An acceptance test asserts a specific acceptance criteria, or user story, or job story, a well defined behaviour that the app is supposed to have.</p>
 <p>A unit test on the other hand asserts the behaviour of a give class or module, the <code>sut</code>, <em>system under test</em>.</p>
 <p>The scope and the design of these two tests are completely different, and it is also important to say that they don&#39;t replace each other. A 100% coverage and green unit test suite doesn&#39;t necessarily mean that the acceptance tests will pass, and vice versa.</p>
 <p>Unit tests are very important, and <a href="http://mokagio.github.io/acceptance-tests-cocoaheads-talk/#/4">you should write them</a>.</p>
-<h3 id="acceptance-test-automated-test">Acceptance test != Automated test</h3>
+<h3 id="acceptance-test--automated-test">Acceptance test != Automated test</h3>
 <p>An acceptance test doesn&#39;t have to be automated by definition. Having the intern make sure that when logging in with Facebook the profile picture is set as the same on of the Facebook profile is an acceptance test. But it is definitely not automated.</p>
 <p>At the same time, having Travis CI running the unit tests for the project after every push to the repo is a way of running tests automatically, but those are not acceptance tests.</p>
 <p>This post (and talk) is about <strong>automated acceptance tests</strong>. For the rest of the post we will omit the automated part of the name.</p>
@@ -51,7 +51,7 @@
 <li>The project has clear requirements and specifications. Since updating acceptance tests is painful you don&#39;t want to have to do it once a week.</li>
 <li>The project doesn&#39;t have a strict deadline. If you&#39;re writing test code you are clearly not writing production code. But while in most cases writing unit tests is a good use of time because the resulting software design is better, and on the long run unit tests will allow you to make changes more quickly, the same might not be true for acceptance tests. Don&#39;t run acceptance tests if you are in a rush.</li>
 </ul>
-<h2 id="i-want-to-write-acceptance-tests-where-do-i-begin-">I want to write acceptance tests, where do I begin?</h2>
+<h2 id="i-want-to-write-acceptance-tests-where-do-i-begin">I want to write acceptance tests, where do I begin?</h2>
 <p><img src="https://s3.amazonaws.com/mokacoding/2015-06-23-where-to-start.png" alt="Where do I begin?"></p>
 <p>Getting started with acceptance testing on iOS is becoming easier and easier. Apple <a href="https://mokacoding.com/blog/xcode-7-ui-testing/">just released a new UI testing framework</a> which allows you to automagically write tests cases simply by running the app on the Simulator and interacting with it. It is fully integrated with <code>XCTest</code>, and being completely detached, is on another target, from your Release code, is a safe way where to write some Swift code without the problems of Objective-C interoperability.</p>
 <p>For the past years <a href="https://github.com/kif-framework/KIF">KIF</a> has been one of the best open source frameworks to use to write tests for the behaviour of your apps. The community around it is pretty active, and I&#39;m looking forward to see how we&#39;re gonna be able to leverage the new APIs provided by UI testing to make KIF an even better framework.</p>

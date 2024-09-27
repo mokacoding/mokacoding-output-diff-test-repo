@@ -12,10 +12,9 @@ When that happens, there&#39;s often a bug.</p>
 A different way to look at them, though, is as an asymmetry between the desired behavior and the authors&#39; understanding of what the code they wrote would end up doing.</p>
 <p>For example, you might expect that calling a view method named <code>display(_: Bool)</code> passing <code>true</code> will result in the view being displayed.
 But, if the method implementation is as follows, the view will be hidden instead.</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">display</span><span class="hljs-params">(<span class="hljs-number">_</span> shouldHide: Bool)</span></span> {
-  shouldHide ? hide() : show()
-}
-</code></pre>
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">display</span>(<span class="hljs-keyword">_</span> <span class="hljs-params">shouldHide</span>: <span class="hljs-type">Bool</span>)</span> {
+  shouldHide <span class="hljs-operator">?</span> hide() : show()
+}</code></pre>
 <p>The difference between the mental representation<sup id="mental-representation-fn-back"><a href="#mental-representation-fn">1</a></sup> of what the code would do and its actual behavior is the source of the bug.</p>
 <p>When reading and writing software, our aim should be to build the most accurate mental representation.</p>
 <p>As the late Anders Ericsson points out in his book <a href="https://geni.us/l8FSc">Peak</a>, it is the quality of mental representations that sets apart the best form the rest.</p>
@@ -42,22 +41,19 @@ This is why designing for local reasoning is important and why we should strive 
 Code with no hidden dependencies, doing only one thing, made up of small components, is easier to follow and reason about.
 There&#39;s less room for mistakes when building a mental representation of it.</p>
 <p>Back to the example above, a simple way to help future readers of the code build an accurate mental representation is to avoid omitting the <a href="https://docs.swift.org/swift-book/LanguageGuide/Functions.html#ID526">argument label</a>.</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">display</span><span class="hljs-params">(shouldHide: Bool)</span></span> {
-  shouldHide ? hide() : show()
-}
-</code></pre>
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">display</span>(<span class="hljs-params">shouldHide</span>: <span class="hljs-type">Bool</span>)</span> {
+  shouldHide <span class="hljs-operator">?</span> hide() : show()
+}</code></pre>
 <p>We could also make the code less surprising by removing the inverse logic.</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">display</span><span class="hljs-params">(shouldShow: Bool)</span></span> {
-  showShow ? show() : hide()
-}
-</code></pre>
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">display</span>(<span class="hljs-params">shouldShow</span>: <span class="hljs-type">Bool</span>)</span> {
+  showShow <span class="hljs-operator">?</span> show() : hide()
+}</code></pre>
 <p>The verb display means &quot;to make a prominent exhibition of (something) in a place that it can be easily seen&quot;.
 It&#39;s a bit weird to use it for a function that can hide a view, the opposite of displaying it.
 We could go even further to help paint an accurate mental image and use a different verb.</p>
-<pre><code class=" hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">updateVisibility</span><span class="hljs-params">(to visible: Bool)</span></span> {
-  visible ? show() : hide()
-}
-</code></pre>
+<pre><code class="hljs swift"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">updateVisibility</span>(<span class="hljs-params">to</span> <span class="hljs-params">visible</span>: <span class="hljs-type">Bool</span>)</span> {
+  visible <span class="hljs-operator">?</span> show() : hide()
+}</code></pre>
 <p>Reading this a call to this version of the method, <code>updateVisibility(to: true)</code>, is less likely to result in an incorrect mental representation.</p>
 <hr>
 <p>Whether you are aware of it or not, you always build a mental representation of your software to understand it.
